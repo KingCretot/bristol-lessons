@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bristol's Lessons | KingCretot Experience</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{ --navy:#1B2C5C; --gold:#E0AC3C; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{
+    font-family:'Nunito',sans-serif; min-height:100vh;
+    background:radial-gradient(circle at 20% 15%,#2c4585 0,var(--navy) 55%);
+    color:#fff; display:flex; align-items:center; justify-content:center;
+    padding:32px 18px;
+  }
+  .hub{ width:100%; max-width:620px; text-align:center; }
+  .crest{ font-size:3.4rem; margin-bottom:6px; }
+  h1{
+    font-family:'Bangers',cursive; font-size:2.9rem; letter-spacing:1.5px;
+    color:var(--gold); line-height:1.1; margin-bottom:6px;
+  }
+  .sub{ font-size:1.05rem; font-weight:600; color:#cdd6ee; margin-bottom:30px; }
+  .grid{ display:grid; gap:16px; }
+  a.card{
+    display:flex; align-items:center; gap:16px; text-decoration:none;
+    background:#fff; color:var(--navy); border-radius:18px;
+    padding:20px 22px; border:3px solid var(--gold);
+    box-shadow:0 6px 0 rgba(0,0,0,.28); transition:transform .12s, box-shadow .12s;
+  }
+  a.card:hover{ transform:translateY(-3px); box-shadow:0 9px 0 rgba(0,0,0,.28); }
+  a.card:active{ transform:translateY(3px); box-shadow:0 2px 0 rgba(0,0,0,.28); }
+  .emoji{ font-size:2.3rem; flex-shrink:0; }
+  .label{ text-align:left; }
+  .label .big{ font-size:1.35rem; font-weight:800; display:block; }
+  .label .small{ font-size:.95rem; font-weight:700; color:#637; }
+  .go{ margin-left:auto; font-family:'Bangers',cursive; font-size:1.3rem; color:var(--gold);
+       background:var(--navy); border-radius:12px; padding:8px 16px; }
+  footer{ margin-top:34px; font-size:.85rem; font-weight:700; color:#9aa6c8; }
+</style>
+</head>
+<body>
+  <div class="hub">
+    <div class="crest">🦊</div>
+    <h1>Bristol's Lesson Hub</h1>
+    <p class="sub">Tap a lesson to begin your quest! ⭐</p>
+
+    <div class="grid">
+      <a class="card" href="BRISTOL_Math_Lesson_W7.html">
+        <span class="emoji">🐮</span>
+        <span class="label"><span class="big">Math &mdash; Week 7</span>
+        <span class="small">Barnyard Math Quest, Unit 7</span></span>
+        <span class="go">GO</span>
+      </a>
+      <a class="card" href="BRISTOL_Math_Lesson_W8.html">
+        <span class="emoji">🐮</span>
+        <span class="label"><span class="big">Math &mdash; Week 8</span>
+        <span class="small">Barnyard Math Quest, Unit 8</span></span>
+        <span class="go">GO</span>
+      </a>
+      <a class="card" href="BRISTOL_LA_Lesson_W7.html">
+        <span class="emoji">🦊</span>
+        <span class="label"><span class="big">Language Arts &mdash; Week 7</span>
+        <span class="small">Storybook Quest, Unit 7</span></span>
+        <span class="go">GO</span>
+      </a>
+      <a class="card" href="BRISTOL_LA_Lesson_W8.html">
+        <span class="emoji">🦊</span>
+        <span class="label"><span class="big">Language Arts &mdash; Week 8</span>
+        <span class="small">Storybook Quest, Unit 8</span></span>
+        <span class="go">GO</span>
+      </a>
+    </div>
+
+    <footer>🦊 KingCretot Experience &middot; Bristol's Storybook Quest 🦊</footer>
+  </div>
+</body>
+</html>
