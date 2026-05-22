@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐮 Bristol's Barnyard Math Quest — Unit 8 | KingCretot Experience</title>
+<style>
+  :root{
+    --navy:#1B2C5C; --gold:#E0AC3C; --sky:#7CC6FF; --grass:#86D464;
+    --pink:#FFB7D5; --pumpkin:#FF9447; --cream:#FFF8E8; --ink:#1f2937;
+    --ok:#2e9d4a; --bad:#dc2626; --shadow:0 4px 14px rgba(27,44,92,.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{font-family:'Nunito','Comic Sans MS',sans-serif;background:linear-gradient(135deg,#FFF8E8 0%,#FFE9D6 50%,#E0F6FF 100%);color:var(--ink);min-height:100vh;font-size:18px;line-height:1.55}
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Bangers&family=Fredoka+One&display=swap');
+
+  /* ===== HUD ===== */
+  .hud{position:fixed;top:0;left:0;right:0;background:linear-gradient(135deg,var(--navy),#0f1a3a);color:#fff;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;z-index:100;box-shadow:var(--shadow);flex-wrap:wrap;gap:8px}
+  .hud-left{display:flex;align-items:center;gap:12px;font-family:'Fredoka One',cursive;font-size:1.2rem}
+  .hud-right{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  .stat{background:rgba(255,255,255,.13);padding:6px 14px;border-radius:20px;font-weight:800;font-size:.95rem;display:flex;align-items:center;gap:6px}
+  .stat .ico{font-size:1.2rem}
+  .xpbar{width:130px;height:10px;background:rgba(255,255,255,.2);border-radius:5px;overflow:hidden}
+  .xpfill{height:100%;background:linear-gradient(90deg,var(--gold),#FFD86F);transition:width .4s;width:0%}
+
+  /* ===== Layout ===== */
+  .wrap{max-width:880px;margin:80px auto 30px;padding:14px}
+  .slide{background:#fff;border-radius:24px;padding:28px;box-shadow:var(--shadow);min-height:520px;display:none;animation:pop .35s ease}
+  .slide.active{display:block}
+  @keyframes pop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+
+  h1{font-family:'Bangers',cursive;font-size:2.4rem;color:var(--navy);letter-spacing:1.5px;margin-bottom:6px}
+  h2{font-family:'Fredoka One',cursive;font-size:1.75rem;color:var(--navy);margin-bottom:12px}
+  h3{font-family:'Fredoka One',cursive;font-size:1.25rem;color:var(--pumpkin);margin:14px 0 8px}
+  p{margin-bottom:10px;font-size:1.05rem}
+
+  .badge{display:inline-block;padding:5px 14px;border-radius:14px;font-weight:900;font-size:.78rem;letter-spacing:1px;text-transform:uppercase;background:linear-gradient(135deg,var(--gold),#F2C465);color:var(--navy);margin-bottom:8px}
+
+  /* ===== Buttons ===== */
+  .btn{padding:13px 26px;border-radius:14px;font-weight:900;border:none;cursor:pointer;font-family:inherit;font-size:1rem;transition:all .15s;display:inline-flex;align-items:center;gap:8px}
+  .btn-go{background:linear-gradient(135deg,var(--grass),#5DB041);color:#fff;box-shadow:0 4px 0 #3D8A30}
+  .btn-go:hover{transform:translateY(-2px);box-shadow:0 6px 0 #3D8A30}
+  .btn-go:active{transform:translateY(2px);box-shadow:0 2px 0 #3D8A30}
+  .btn-back{background:#e5e7eb;color:#374151}
+  .btn-pri{background:linear-gradient(135deg,var(--navy),#314580);color:#fff;box-shadow:0 4px 0 #0f1a3a}
+  .btn-pri:hover{transform:translateY(-2px)}
+
+  /* ===== Nav ===== */
+  .nav{display:flex;justify-content:space-between;align-items:center;margin-top:24px;gap:10px;flex-wrap:wrap}
+  .dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+  .dot{width:11px;height:11px;border-radius:50%;background:#cbd5e1;transition:all .2s}
+  .dot.on{background:var(--gold);transform:scale(1.4)}
+  .dot.done{background:var(--grass)}
+
+  /* ===== Mascots & decoration ===== */
+  .mascot-row{display:flex;justify-content:center;gap:14px;font-size:3.2rem;margin:10px 0 18px;flex-wrap:wrap}
+  .mascot{display:inline-block;animation:bob 2.6s ease-in-out infinite}
+  .mascot:nth-child(2){animation-delay:.3s}
+  .mascot:nth-child(3){animation-delay:.6s}
+  .mascot:nth-child(4){animation-delay:.9s}
+  .mascot:nth-child(5){animation-delay:1.2s}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-12px) rotate(3deg)}}
+
+  /* ===== Cards ===== */
+  .card{background:#fffaf0;border:3px solid #FFE9C7;border-radius:18px;padding:16px;margin:12px 0}
+  .card-pink{background:#FFF0F6;border-color:#FFD3E2}
+  .card-sky{background:#EAF6FF;border-color:#C9E5FB}
+  .card-grass{background:#EFFAE6;border-color:#C9EAB4}
+  .card-gold{background:#FFF6E1;border-color:#FFE0A0}
+
+  /* ===== Quiz layout ===== */
+  .qbox{background:#fff;border:3px solid #E2E8F0;border-radius:18px;padding:18px;margin:14px 0;transition:border-color .25s}
+  .qbox.ok{border-color:var(--ok);background:#F0FBF3}
+  .qbox.bad{border-color:var(--bad);background:#FEF2F2}
+  .qprompt{font-weight:800;font-size:1.05rem;margin-bottom:12px;color:var(--navy)}
+  .opts{display:grid;grid-template-columns:1fr;gap:8px}
+  @media(min-width:600px){.opts{grid-template-columns:1fr 1fr}}
+  .opt{background:#fff;border:3px solid #cbd5e1;border-radius:12px;padding:12px 14px;font-weight:700;cursor:pointer;text-align:left;font-family:inherit;font-size:1rem;transition:all .15s}
+  .opt:hover{border-color:var(--gold);background:#FFF8E8;transform:translateY(-2px)}
+  .opt.right{background:#D9F7E1;border-color:var(--ok);color:#065f46}
+  .opt.wrong{background:#FFE2E2;border-color:var(--bad);color:#991b1b}
+  .opt:disabled{cursor:not-allowed}
+  .feedback{margin-top:10px;padding:12px;border-radius:10px;font-weight:700;font-size:.96rem;display:none}
+  .feedback.show{display:block}
+  .feedback.ok{background:#D9F7E1;color:#065f46}
+  .feedback.bad{background:#FFE2E2;color:#991b1b}
+
+  /* ===== Fill in inputs ===== */
+  .fillrow{display:flex;align-items:center;gap:10px;margin:10px 0;flex-wrap:wrap;background:#fffaf0;padding:10px 14px;border-radius:12px;border:2px dashed #FFC97A}
+  .fillrow input{font-family:inherit;font-size:1.05rem;font-weight:800;padding:8px 12px;border:2px solid #cbd5e1;border-radius:9px;width:90px;text-align:center;background:#fff}
+  .fillrow input.ok{border-color:var(--ok);background:#D9F7E1}
+  .fillrow input.bad{border-color:var(--bad);background:#FFE2E2}
+  .checkbtn{padding:9px 18px;border-radius:10px;border:none;background:var(--pumpkin);color:#fff;font-weight:900;cursor:pointer;font-family:inherit}
+  .checkbtn:hover{background:#E07A2F}
+
+  /* ===== Visual elements ===== */
+  .standalg{display:grid;grid-template-columns:auto auto;gap:0 14px;font-family:'Fredoka One',cursive;font-size:1.6rem;justify-content:center;background:#FFFEF5;border:3px solid #FFE9C7;border-radius:14px;padding:18px;margin:10px auto;width:fit-content;color:var(--navy)}
+  .standalg .op{grid-column:1;text-align:right;color:var(--pumpkin)}
+  .standalg .num{grid-column:2;text-align:right;letter-spacing:6px}
+  .standalg .line{grid-column:1/3;border-bottom:3px solid var(--navy);margin-top:4px}
+  .carry{font-size:.9rem;color:var(--bad);font-weight:900}
+
+  .clock-svg{display:block;margin:10px auto}
+  .coin-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:14px 0}
+  .coin{font-size:2.4rem;display:inline-block;animation:spin 4s linear infinite}
+  @keyframes spin{0%,100%{transform:rotateY(0)}50%{transform:rotateY(180deg)}}
+
+  /* ===== Confetti ===== */
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:200;display:none}
+  .conf-piece{position:absolute;width:10px;height:10px;animation:fall 1.6s linear forwards}
+  @keyframes fall{to{transform:translateY(100vh) rotate(720deg);opacity:0}}
+
+  /* ===== Wrong-X overlay ===== */
+  #xover{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:150;pointer-events:none}
+  #xover.show{display:flex;animation:xpop .55s ease-out}
+  #xover .x{font-size:9rem;color:var(--bad);font-weight:900;text-shadow:0 0 24px rgba(220,38,38,.5)}
+  @keyframes xpop{0%{transform:scale(.3);opacity:0}40%{transform:scale(1.3);opacity:1}100%{transform:scale(1);opacity:0}}
+
+  .quote{font-style:italic;text-align:center;font-size:1.15rem;color:var(--navy);background:linear-gradient(135deg,#FFF6E1,#FFE9C7);padding:18px;border-radius:16px;border-left:6px solid var(--gold);margin:20px 0}
+
+  .review-grid{display:grid;grid-template-columns:1fr;gap:10px;margin:14px 0}
+  @media(min-width:600px){.review-grid{grid-template-columns:1fr 1fr}}
+  .review-card{background:linear-gradient(135deg,#FFF6E1,#fffaf0);border:3px solid #FFE0A0;border-radius:14px;padding:14px;font-weight:700}
+  .review-card strong{color:var(--pumpkin);display:block;margin-bottom:4px}
+
+  .footer-tag{text-align:center;color:#64748b;font-size:.82rem;margin-top:14px;font-weight:700}
+</style>
+</head>
+<body>
+
+<!-- ===== HUD ===== -->
+<div class="hud">
+  <div class="hud-left">🐮 Bristol's Barnyard Math — Unit 8</div>
+  <div class="hud-right">
+    <div class="stat"><span class="ico">⭐</span><span id="xpVal">0</span> XP</div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="stat"><span class="ico">🪙</span><span id="coinVal">0</span></div>
+    <div class="stat"><span class="ico">🏆</span> Lvl <span id="lvlVal">1</span></div>
+  </div>
+</div>
+
+<div class="wrap">
+<!-- ===== Slide 0: Welcome ===== -->
+<div class="slide active" id="s0">
+  <span class="badge">⭐ Unit 8 · Adventure!</span>
+  <h1>🐮 Welcome Back, Bristol!</h1>
+  <div class="mascot-row">🐔 🐄 🐖 🐎 🐑</div>
+  <div class="card card-gold">
+    <p style="font-size:1.1rem"><strong>Math champion, you're on a roll!</strong> This week we become number experts — building big numbers, comparing them, and turning groups into multiplication. The barnyard is proud of you!</p>
+  </div>
+  <h3>🎯 What you'll learn today:</h3>
+  <div class="review-grid">
+    <div class="review-card"><strong>🏠 Place Value</strong>Hundreds, tens and ones to 1,000</div>
+    <div class="review-card"><strong>⚖️ Comparing</strong>Greater than, less than, equal</div>
+    <div class="review-card"><strong>🟩 Arrays</strong>Rows and columns make groups</div>
+    <div class="review-card"><strong>✖️ ×8 Facts</strong>The eight family</div>
+  </div>
+  <div class="card card-pink">
+    <p>🎮 <strong>How to win XP:</strong> Get answers right to earn ⭐ XP and 🪙 coins. Tap an answer to lock it in!</p>
+  </div>
+  <div class="nav">
+    <span></span>
+    <button class="btn btn-go" onclick="go(1)">Let's Begin! 🚀</button>
+  </div>
+</div>
+<!-- ===== Slide 1: Review ===== -->
+<div class="slide" id="s1">
+  <span class="badge">🔁 Quick Review</span>
+  <h2>What we learned in Unit 7</h2>
+  <p>Let's wake up our math brains with a quick warm-up! 🧠✨</p>
+
+  <div class="qbox" data-q="r1">
+    <div class="qprompt">🐄 348 + 126 = ?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="1">474</button>
+      <button class="opt" data-i="1" data-c="0">464</button>
+      <button class="opt" data-i="2" data-c="0">484</button>
+      <button class="opt" data-i="3" data-c="0">374</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="r2">
+    <div class="qprompt">🐑 615 − 287 = ?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="1">328</button>
+      <button class="opt" data-i="1" data-c="0">428</button>
+      <button class="opt" data-i="2" data-c="0">338</button>
+      <button class="opt" data-i="3" data-c="0">318</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="r3">
+    <div class="qprompt">🐎 7 × 6 = ?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">49</button>
+      <button class="opt" data-i="1" data-c="0">48</button>
+      <button class="opt" data-i="2" data-c="0">36</button>
+      <button class="opt" data-i="3" data-c="1">42</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="r4">
+    <div class="qprompt">🍕 A pie is cut into 4 equal parts. One part is a —</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">half</button>
+      <button class="opt" data-i="1" data-c="0">third</button>
+      <button class="opt" data-i="2" data-c="1">fourth</button>
+      <button class="opt" data-i="3" data-c="0">whole</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="nav">
+    <button class="btn btn-back" onclick="go(0)">← Back</button>
+    <div class="dots" id="dots"></div>
+    <button class="btn btn-go" onclick="go(2)">Next: Place Value! 🏠</button>
+  </div>
+</div>
+<!-- ===== Slide 2: Place Value to 1,000 ===== -->
+<div class="slide" id="s2">
+  <span class="badge">🏠 Place Value</span>
+  <h2>Place Value to 1,000</h2>
+  <p>Every digit in a number has a <strong>place</strong> and that place gives it a <strong>value</strong>. Let's build numbers like barns! 🧱</p>
+  <div class="card card-grass">
+    <h3>🧮 The Number 426</h3>
+    <div class="review-grid">
+      <div class="review-card"><strong>4 hundreds = 400</strong>The hundreds place</div>
+      <div class="review-card"><strong>2 tens = 20</strong>The tens place</div>
+      <div class="review-card"><strong>6 ones = 6</strong>The ones place</div>
+      <div class="review-card"><strong>Expanded form</strong>400 + 20 + 6 = 426</div>
+    </div>
+  </div>
+  <div class="card card-sky">
+    <h3>🐔 Build it!</h3>
+    <p>The henhouse number is made of <strong>3 hundreds, 5 tens, and 7 ones</strong>. Write the whole number.</p>
+    <div class="fillrow">
+      <span>The number is </span>
+      <input type="text" id="pv1" maxlength="6">
+      <button class="checkbtn" onclick="checkFill('pv1','357','pv1fb')">Check</button>
+      <span id="pv1fb" style="font-weight:800"></span>
+    </div>
+  </div>
+
+  <div class="qbox" data-q="p1">
+    <div class="qprompt">🏠 What is the VALUE of the 8 in the number 482?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">8</button>
+      <button class="opt" data-i="1" data-c="0">800</button>
+      <button class="opt" data-i="2" data-c="0">88</button>
+      <button class="opt" data-i="3" data-c="1">80</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="p2">
+    <div class="qprompt">🧮 Which is the expanded form of 615?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">6 + 1 + 5</button>
+      <button class="opt" data-i="1" data-c="1">600 + 10 + 5</button>
+      <button class="opt" data-i="2" data-c="0">600 + 100 + 5</button>
+      <button class="opt" data-i="3" data-c="0">61 + 5</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="p3">
+    <div class="qprompt">🐄 5 hundreds + 0 tens + 9 ones makes which number?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">590</button>
+      <button class="opt" data-i="1" data-c="0">59</button>
+      <button class="opt" data-i="2" data-c="0">5009</button>
+      <button class="opt" data-i="3" data-c="1">509</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="nav">
+    <button class="btn btn-back" onclick="go(1)">← Back</button>
+    <div class="dots"></div>
+    <button class="btn btn-go" onclick="go(3)">Next: Comparing! ⚖️</button>
+  </div>
+</div>
+<!-- ===== Slide 3: Comparing & Ordering Numbers ===== -->
+<div class="slide" id="s3">
+  <span class="badge">⚖️ Comparing</span>
+  <h2>Comparing & Ordering Numbers</h2>
+  <p>To compare numbers, start at the <strong>biggest place</strong> (hundreds) and work right. The <strong>alligator mouth</strong> always opens toward the bigger number! 🐊</p>
+  <div class="card card-pink">
+    <h3>🐊 The Comparing Symbols</h3>
+    <div class="review-grid">
+      <div class="review-card"><strong>&gt; greater than</strong>465 &gt; 399 (the mouth eats the bigger one)</div>
+      <div class="review-card"><strong>&lt; less than</strong>208 &lt; 280</div>
+      <div class="review-card"><strong>= equal to</strong>314 = 314</div>
+      <div class="review-card"><strong>Rule</strong>Compare hundreds first, then tens, then ones</div>
+    </div>
+  </div>
+  <div class="card card-grass">
+    <h3>🐑 Try it!</h3>
+    <p>Which symbol goes between <strong>372 ___ 327</strong>? Type one of: &gt; &lt; =</p>
+    <div class="fillrow">
+      <span>372 ___ 327, the symbol is </span>
+      <input type="text" id="cmp1" maxlength="6">
+      <button class="checkbtn" onclick="checkFill('cmp1','>','cmp1fb')">Check</button>
+      <span id="cmp1fb" style="font-weight:800"></span>
+    </div>
+  </div>
+
+  <div class="qbox" data-q="c1">
+    <div class="qprompt">⚖️ Which number is the GREATEST?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="1">703</button>
+      <button class="opt" data-i="1" data-c="0">699</button>
+      <button class="opt" data-i="2" data-c="0">670</button>
+      <button class="opt" data-i="3" data-c="0">377</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="c2">
+    <div class="qprompt">🐊 Which sign makes it true: 248 ___ 254?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="1"><</button>
+      <button class="opt" data-i="1" data-c="0">></button>
+      <button class="opt" data-i="2" data-c="0">=</button>
+      <button class="opt" data-i="3" data-c="0">+</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="c3">
+    <div class="qprompt">🔢 Put in order from LEAST to greatest — which order is correct?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">891, 198, 189</button>
+      <button class="opt" data-i="1" data-c="0">198, 189, 891</button>
+      <button class="opt" data-i="2" data-c="1">189, 198, 891</button>
+      <button class="opt" data-i="3" data-c="0">189, 891, 198</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="nav">
+    <button class="btn btn-back" onclick="go(2)">← Back</button>
+    <div class="dots"></div>
+    <button class="btn btn-go" onclick="go(4)">Next: Arrays! 🟩</button>
+  </div>
+</div>
+<!-- ===== Slide 4: Arrays & Equal Groups ===== -->
+<div class="slide" id="s4">
+  <span class="badge">🟩 Arrays</span>
+  <h2>Arrays & Equal Groups</h2>
+  <p>An <strong>array</strong> is objects lined up in equal <strong>rows</strong> and <strong>columns</strong>. Arrays turn counting into fast multiplication! 📦</p>
+  <div class="card card-gold">
+    <h3>🥚 An Egg-Carton Array</h3>
+    <p>Picture a carton with <strong>3 rows</strong> of <strong>6 eggs</strong> each:</p>
+    <p style="font-size:1.8rem;text-align:center;letter-spacing:6px">🥚🥚🥚🥚🥚🥚<br>🥚🥚🥚🥚🥚🥚<br>🥚🥚🥚🥚🥚🥚</p>
+    <p style="text-align:center;font-weight:800">3 rows × 6 in each row = <span style="color:var(--ok)">18 eggs</span></p>
+    <p><strong>Repeated addition</strong> says the same thing: 6 + 6 + 6 = 18.</p>
+  </div>
+  <div class="card card-sky">
+    <h3>🐔 Try it!</h3>
+    <p>The chicken yard has <strong>4 rows</strong> with <strong>5 chickens</strong> in each row. How many chickens in all?</p>
+    <div class="fillrow">
+      <span>4 × 5 = </span>
+      <input type="text" id="arr1" maxlength="6">
+      <button class="checkbtn" onclick="checkFill('arr1','20','arr1fb')">Check</button>
+      <span id="arr1fb" style="font-weight:800"></span>
+    </div>
+  </div>
+
+  <div class="qbox" data-q="ar1">
+    <div class="qprompt">🟩 An array has 5 rows of 3. How many in all?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">8</button>
+      <button class="opt" data-i="1" data-c="1">15</button>
+      <button class="opt" data-i="2" data-c="0">53</button>
+      <button class="opt" data-i="3" data-c="0">12</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="ar2">
+    <div class="qprompt">➕ Which addition matches the array 4 rows of 6?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">4 + 6</button>
+      <button class="opt" data-i="1" data-c="0">6 + 4</button>
+      <button class="opt" data-i="2" data-c="0">4 + 4 + 4</button>
+      <button class="opt" data-i="3" data-c="1">6 + 6 + 6 + 6</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="ar3">
+    <div class="qprompt">📦 Bristol stacks 2 rows of 8 hay bales. How many bales?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">10</button>
+      <button class="opt" data-i="1" data-c="1">16</button>
+      <button class="opt" data-i="2" data-c="0">28</button>
+      <button class="opt" data-i="3" data-c="0">82</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="nav">
+    <button class="btn btn-back" onclick="go(3)">← Back</button>
+    <div class="dots"></div>
+    <button class="btn btn-go" onclick="go(5)">Next: ×8 Facts! ✖️</button>
+  </div>
+</div>
+<!-- ===== Slide 5: Master the ×8 Facts ===== -->
+<div class="slide" id="s5">
+  <span class="badge">✖️ Times Tables</span>
+  <h2>Master the ×8 Facts</h2>
+  <p>Eight is a powerful number! Here's the secret: <strong>×8 is ×4 doubled.</strong> If 4×6 = 24, then 8×6 = 48. 💪</p>
+  <div class="card card-pink">
+    <h3>🎱 The ×8 Family</h3>
+    <p style="font-weight:700">Skip count: 8, 16, 24, 32, 40, 48, 56, 64, 72, 80.</p>
+    <div class="review-grid">
+      <div class="review-card"><strong>8 × 1 = 8</strong>One spider's legs</div>
+      <div class="review-card"><strong>8 × 2 = 16</strong>Double 8</div>
+      <div class="review-card"><strong>8 × 3 = 24</strong>Hours in a day</div>
+      <div class="review-card"><strong>8 × 4 = 32</strong>Skip-count check</div>
+      <div class="review-card"><strong>8 × 5 = 40</strong>Ends in 0</div>
+      <div class="review-card"><strong>8 × 6 = 48</strong>4×6 doubled</div>
+      <div class="review-card"><strong>8 × 7 = 56</strong>Tricky one!</div>
+      <div class="review-card"><strong>8 × 8 = 64</strong>Square fact</div>
+      <div class="review-card"><strong>8 × 9 = 72</strong>Big number</div>
+      <div class="review-card"><strong>8 × 10 = 80</strong>Add a zero</div>
+    </div>
+  </div>
+  <div class="card card-grass">
+    <h3>🐖 Try it!</h3>
+    <p>The farm has 8 pig pens. Each pen holds 3 piglets. How many piglets in all?</p>
+    <div class="fillrow">
+      <span>8 × 3 = </span>
+      <input type="text" id="m8" maxlength="6">
+      <button class="checkbtn" onclick="checkFill('m8','24','m8fb')">Check</button>
+      <span id="m8fb" style="font-weight:800"></span>
+    </div>
+  </div>
+
+  <div class="qbox" data-q="e1">
+    <div class="qprompt">🎱 8 × 5 = ?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">32</button>
+      <button class="opt" data-i="1" data-c="1">40</button>
+      <button class="opt" data-i="2" data-c="0">45</button>
+      <button class="opt" data-i="3" data-c="0">13</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="e2">
+    <div class="qprompt">🕷️ 8 × 7 = ?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="1">56</button>
+      <button class="opt" data-i="1" data-c="0">54</button>
+      <button class="opt" data-i="2" data-c="0">63</button>
+      <button class="opt" data-i="3" data-c="0">48</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="e3">
+    <div class="qprompt">🐄 8 cows each have 8 spots. How many spots in all?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">16</button>
+      <button class="opt" data-i="1" data-c="0">56</button>
+      <button class="opt" data-i="2" data-c="1">64</button>
+      <button class="opt" data-i="3" data-c="0">72</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="nav">
+    <button class="btn btn-back" onclick="go(4)">← Back</button>
+    <div class="dots"></div>
+    <button class="btn btn-go" onclick="go(6)">Next: Graphs! 📊</button>
+  </div>
+</div>
+<!-- ===== Slide 6: Picture & Bar Graphs ===== -->
+<div class="slide" id="s6">
+  <span class="badge">📊 Data</span>
+  <h2>Picture & Bar Graphs</h2>
+  <p>A <strong>graph</strong> shows information as a picture so we can compare quickly. We read graphs to answer questions! 🔍</p>
+  <div class="card card-sky">
+    <h3>🐔 Eggs Collected This Week</h3>
+    <div class="card card-gold" style="font-size:1.15rem;line-height:1.9">
+      <div><strong>Mon</strong> &nbsp;🥚🥚🥚 &nbsp;(3)</div>
+      <div><strong>Tue</strong> &nbsp;🥚🥚🥚🥚🥚 &nbsp;(5)</div>
+      <div><strong>Wed</strong> &nbsp;🥚🥚 &nbsp;(2)</div>
+      <div><strong>Thu</strong> &nbsp;🥚🥚🥚🥚 &nbsp;(4)</div>
+    </div>
+    <p style="margin-top:8px"><strong>Each 🥚 = 1 egg.</strong> Count the pictures to read the data!</p>
+  </div>
+  <div class="card card-grass">
+    <h3>🔍 Try it!</h3>
+    <p>Using the graph above — how many eggs were collected on <strong>Tuesday and Wednesday together</strong>?</p>
+    <div class="fillrow">
+      <span>5 + 2 = </span>
+      <input type="text" id="g1" maxlength="6">
+      <button class="checkbtn" onclick="checkFill('g1','7','g1fb')">Check</button>
+      <span id="g1fb" style="font-weight:800"></span>
+    </div>
+  </div>
+
+  <div class="qbox" data-q="d1">
+    <div class="qprompt">📊 Using the graph, which day had the MOST eggs?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">Monday</button>
+      <button class="opt" data-i="1" data-c="1">Tuesday</button>
+      <button class="opt" data-i="2" data-c="0">Wednesday</button>
+      <button class="opt" data-i="3" data-c="0">Thursday</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="d2">
+    <div class="qprompt">🔍 How many MORE eggs were collected Thursday than Wednesday?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">4</button>
+      <button class="opt" data-i="1" data-c="0">6</button>
+      <button class="opt" data-i="2" data-c="1">2</button>
+      <button class="opt" data-i="3" data-c="0">1</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="d3">
+    <div class="qprompt">🥚 How many eggs were collected in the WHOLE week shown?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">12</button>
+      <button class="opt" data-i="1" data-c="0">10</button>
+      <button class="opt" data-i="2" data-c="1">14</button>
+      <button class="opt" data-i="3" data-c="0">16</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="nav">
+    <button class="btn btn-back" onclick="go(5)">← Back</button>
+    <div class="dots"></div>
+    <button class="btn btn-go" onclick="go(7)">Final Quiz! 🏆</button>
+  </div>
+</div>
+<!-- ===== Slide 7: Final Quiz ===== -->
+<div class="slide" id="s7">
+  <span class="badge">🏆 Final Challenge</span>
+  <h2>Show What You Know!</h2>
+  <p>Bring it all together — you've got this, champion! 🐮💪</p>
+
+  <div class="qbox" data-q="f1">
+    <div class="qprompt">🏠 What is the value of the 7 in 471?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="1">70</button>
+      <button class="opt" data-i="1" data-c="0">7</button>
+      <button class="opt" data-i="2" data-c="0">700</button>
+      <button class="opt" data-i="3" data-c="0">77</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="f2">
+    <div class="qprompt">⚖️ Which sign makes it true: 530 ___ 503?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="1">></button>
+      <button class="opt" data-i="1" data-c="0"><</button>
+      <button class="opt" data-i="2" data-c="0">=</button>
+      <button class="opt" data-i="3" data-c="0">x</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="f3">
+    <div class="qprompt">🟩 An array has 6 rows of 4. How many in all?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">10</button>
+      <button class="opt" data-i="1" data-c="1">24</button>
+      <button class="opt" data-i="2" data-c="0">64</button>
+      <button class="opt" data-i="3" data-c="0">20</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="f4">
+    <div class="qprompt">🎱 8 × 6 = ?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">42</button>
+      <button class="opt" data-i="1" data-c="0">54</button>
+      <button class="opt" data-i="2" data-c="0">16</button>
+      <button class="opt" data-i="3" data-c="1">48</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="f5">
+    <div class="qprompt">🧮 Which is the expanded form of 308?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">30 + 8</button>
+      <button class="opt" data-i="1" data-c="0">300 + 80</button>
+      <button class="opt" data-i="2" data-c="0">3 + 0 + 8</button>
+      <button class="opt" data-i="3" data-c="1">300 + 0 + 8</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="f6">
+    <div class="qprompt">➕ Which addition matches an array of 3 rows of 7?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">3 + 7</button>
+      <button class="opt" data-i="1" data-c="0">3 + 3 + 3</button>
+      <button class="opt" data-i="2" data-c="1">7 + 7 + 7</button>
+      <button class="opt" data-i="3" data-c="0">7 + 3</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="f7">
+    <div class="qprompt">🔢 Which list is ordered LEAST to greatest?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">912, 291, 219</button>
+      <button class="opt" data-i="1" data-c="0">291, 219, 912</button>
+      <button class="opt" data-i="2" data-c="1">219, 291, 912</button>
+      <button class="opt" data-i="3" data-c="0">219, 912, 291</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="f8">
+    <div class="qprompt">🐔 8 nests each hold 4 eggs. How many eggs in all?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">12</button>
+      <button class="opt" data-i="1" data-c="1">32</button>
+      <button class="opt" data-i="2" data-c="0">24</button>
+      <button class="opt" data-i="3" data-c="0">84</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="nav">
+    <button class="btn btn-back" onclick="go(6)">← Back</button>
+    <div class="dots"></div>
+    <button class="btn btn-go" onclick="go(8)">Finish! 🏆</button>
+  </div>
+</div>
+<!-- ===== Slide 8: Finale ===== -->
+<div class="slide" id="s8">
+  <span class="badge">🌟 You Did It!</span>
+  <h1 style="text-align:center">🎉 Outstanding, Bristol! 🎉</h1>
+  <div class="mascot-row">🐔 🐄 🐖 🐎 🐑</div>
+  <div class="card card-gold" style="text-align:center">
+    <h2>Your Final Score</h2>
+    <p style="font-size:2.4rem;font-family:'Bangers',cursive;color:var(--navy)">⭐ <span id="finalXP">0</span> XP · 🪙 <span id="finalCoins">0</span> coins</p>
+    <p style="font-size:1.2rem;font-weight:800;color:var(--pumpkin)" id="finalLvl">Champion!</p>
+  </div>
+  <div class="quote">
+    "A number is only as big as it looks until you understand its parts. You can now build, compare, and group numbers like a true math champion, Bristol."<br><strong>— Coach Jonathan, KingCretot Experience</strong>
+  </div>
+  <div class="card card-pink" style="text-align:center">
+    <h3>📝 Your Mission Tonight:</h3>
+    <p>Complete your <strong>Unit 8 Post-Lesson Activity Packet</strong> with a parent or grown-up!</p>
+  </div>
+  <div class="footer-tag">🐮 KingCretot Experience · Bristol's Math Quest · Unit 8 🐮</div>
+</div>
+
+</div><!-- /wrap -->
+
+<!-- ===== Effects ===== -->
+<div id="confetti"></div>
+<div id="xover"><div class="x">✕</div></div>
+<script>
+/* ============ State ============ */
+const state = { xp:0, coins:0, lvl:1, answered:{} };
+const SLIDES = 9;
+const FINALE = 8;
+
+function updateHud(){
+  document.getElementById('xpVal').textContent = state.xp;
+  document.getElementById('coinVal').textContent = state.coins;
+  document.getElementById('lvlVal').textContent = state.lvl;
+  const pct = Math.min(100, (state.xp % 100));
+  document.getElementById('xpFill').style.width = pct + '%';
+  if (state.xp >= state.lvl * 100) state.lvl++;
+}
+function addXP(n){ state.xp += n; updateHud(); }
+function addCoins(n){ state.coins += n; updateHud(); }
+
+/* ============ Navigation ============ */
+function go(i){
+  document.querySelectorAll('.slide').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s'+i).classList.add('active');
+  buildDots(i);
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(i === FINALE) showFinal();
+}
+function buildDots(active){
+  document.querySelectorAll('.dots').forEach(d=>{
+    d.innerHTML = '';
+    for (let k=0; k<SLIDES; k++){
+      const dot = document.createElement('div');
+      dot.className = 'dot' + (k===active?' on':'') + (k<active?' done':'');
+      d.appendChild(dot);
+    }
+  });
+}
+
+/* ============ Sound (Web Audio) ============ */
+let audioCtx;
+function getCtx(){
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+function playRight(){
+  const c = getCtx();
+  [523, 659, 784, 1047].forEach((f,i)=>{
+    const o = c.createOscillator(), g = c.createGain();
+    o.type='sine'; o.frequency.value=f;
+    g.gain.setValueAtTime(0,c.currentTime+i*0.08);
+    g.gain.linearRampToValueAtTime(0.18,c.currentTime+i*0.08+0.02);
+    g.gain.linearRampToValueAtTime(0,c.currentTime+i*0.08+0.18);
+    o.connect(g); g.connect(c.destination);
+    o.start(c.currentTime+i*0.08); o.stop(c.currentTime+i*0.08+0.2);
+  });
+}
+function playWrong(){
+  const c = getCtx();
+  const o = c.createOscillator(), g = c.createGain();
+  o.type='sawtooth'; o.frequency.setValueAtTime(220, c.currentTime);
+  o.frequency.linearRampToValueAtTime(80, c.currentTime+0.4);
+  g.gain.setValueAtTime(0.16, c.currentTime);
+  g.gain.linearRampToValueAtTime(0, c.currentTime+0.4);
+  o.connect(g); g.connect(c.destination);
+  o.start(); o.stop(c.currentTime+0.4);
+}
+
+/* ============ Confetti ============ */
+function confetti(){
+  const root = document.getElementById('confetti');
+  root.style.display = 'block';
+  const colors = ['#E0AC3C','#FF9447','#86D464','#7CC6FF','#FFB7D5','#E85D2C','#0E9F9A','#6F3F8F'];
+  for (let i=0; i<70; i++){
+    const p = document.createElement('div');
+    p.className = 'conf-piece';
+    p.style.left = Math.random()*100 + '%';
+    p.style.top = -10 + 'px';
+    p.style.background = colors[Math.floor(Math.random()*colors.length)];
+    p.style.animationDelay = (Math.random()*0.4) + 's';
+    p.style.animationDuration = (1.2 + Math.random()*1.2) + 's';
+    p.style.borderRadius = (Math.random()>0.5 ? '50%' : '2px');
+    root.appendChild(p);
+  }
+  setTimeout(()=>{ root.innerHTML=''; root.style.display='none'; }, 2400);
+}
+function flashX(){
+  const x = document.getElementById('xover');
+  x.classList.add('show');
+  setTimeout(()=>x.classList.remove('show'), 600);
+}
+
+/* ============ MC Quiz registry (single delegate) ============ */
+document.addEventListener('click', e=>{
+  const opt = e.target.closest('.opt');
+  if (!opt) return;
+  const box = opt.closest('.qbox');
+  if (!box) return;
+  const qid = box.dataset.q;
+  if (state.answered[qid]) return;
+  const correct = opt.dataset.c === '1';
+  const fb = box.querySelector('.feedback');
+  box.querySelectorAll('.opt').forEach(b=>b.disabled=true);
+  if (correct){
+    opt.classList.add('right');
+    box.classList.add('ok');
+    fb.textContent = '🎉 Correct! Great thinking!';
+    fb.className = 'feedback show ok';
+    addXP(10); addCoins(2);
+    playRight(); confetti();
+  } else {
+    opt.classList.add('wrong');
+    box.classList.add('bad');
+    box.querySelectorAll('.opt').forEach(b=>{
+      if (b.dataset.c === '1') b.classList.add('right');
+    });
+    fb.textContent = '❌ Not quite — see the green answer above. Keep going, you have got this!';
+    fb.className = 'feedback show bad';
+    playWrong(); flashX();
+  }
+  state.answered[qid] = true;
+});
+
+/* ============ Fill-in ============ */
+function checkFill(inputId, correct, fbId){
+  const inp = document.getElementById(inputId);
+  const fb = document.getElementById(fbId);
+  if (state.answered['fill-'+inputId]) return;
+  const val = inp.value.trim().toLowerCase();
+  if (val === String(correct).toLowerCase()){
+    inp.classList.add('ok'); inp.disabled = true;
+    fb.textContent = '✅ Yes! ' + correct;
+    fb.style.color = 'var(--ok)';
+    addXP(8); addCoins(2);
+    playRight(); confetti();
+    state.answered['fill-'+inputId] = true;
+  } else {
+    inp.classList.add('bad');
+    fb.textContent = '❌ Try again!';
+    fb.style.color = 'var(--bad)';
+    playWrong(); flashX();
+    setTimeout(()=>{ inp.classList.remove('bad'); fb.textContent=''; }, 1500);
+  }
+}
+
+/* ============ Final ============ */
+function showFinal(){
+  document.getElementById('finalXP').textContent = state.xp;
+  document.getElementById('finalCoins').textContent = state.coins;
+  let title = 'Math Champion! 🏆';
+  if (state.xp >= 200) title = 'Barnyard MASTER! 🌟';
+  else if (state.xp >= 120) title = 'Math Wizard! ✨';
+  else if (state.xp >= 60) title = 'Rising Star! ⭐';
+  document.getElementById('finalLvl').textContent = title;
+  setTimeout(confetti, 300);
+  setTimeout(confetti, 1200);
+}
+
+updateHud();
+buildDots(0);
+</script>
+</body>
+</html>
