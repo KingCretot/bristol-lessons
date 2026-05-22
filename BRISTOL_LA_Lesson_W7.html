@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🦊 Bristol's Storybook Quest — Unit 7 LA | KingCretot Experience</title>
+<style>
+  :root{
+    --navy:#1B2C5C; --gold:#E0AC3C; --berry:#C84B7C; --leaf:#5DA85A;
+    --sky:#7CC6FF; --apricot:#FFB675; --paper:#FFFAEC; --ink:#1f2937;
+    --ok:#2e9d4a; --bad:#dc2626; --shadow:0 4px 14px rgba(27,44,92,.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Bangers&family=Fredoka+One&family=Patrick+Hand&display=swap');
+  html,body{font-family:'Nunito',sans-serif;background:linear-gradient(135deg,#FFFAEC 0%,#F2E8D5 50%,#FFE5D6 100%);color:var(--ink);min-height:100vh;font-size:18px;line-height:1.55}
+
+  /* ===== HUD ===== */
+  .hud{position:fixed;top:0;left:0;right:0;background:linear-gradient(135deg,var(--navy),#0f1a3a);color:#fff;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;z-index:100;box-shadow:var(--shadow);flex-wrap:wrap;gap:8px}
+  .hud-left{display:flex;align-items:center;gap:12px;font-family:'Fredoka One',cursive;font-size:1.2rem}
+  .hud-right{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  .stat{background:rgba(255,255,255,.13);padding:6px 14px;border-radius:20px;font-weight:800;font-size:.95rem;display:flex;align-items:center;gap:6px}
+  .xpbar{width:130px;height:10px;background:rgba(255,255,255,.2);border-radius:5px;overflow:hidden}
+  .xpfill{height:100%;background:linear-gradient(90deg,var(--gold),#FFD86F);transition:width .4s;width:0%}
+
+  /* ===== Layout ===== */
+  .wrap{max-width:880px;margin:80px auto 30px;padding:14px}
+  .slide{background:#fff;border-radius:24px;padding:28px;box-shadow:var(--shadow);min-height:520px;display:none;animation:pop .35s ease}
+  .slide.active{display:block}
+  @keyframes pop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+
+  h1{font-family:'Bangers',cursive;font-size:2.4rem;color:var(--navy);letter-spacing:1.5px;margin-bottom:6px}
+  h2{font-family:'Fredoka One',cursive;font-size:1.75rem;color:var(--navy);margin-bottom:12px}
+  h3{font-family:'Fredoka One',cursive;font-size:1.25rem;color:var(--berry);margin:14px 0 8px}
+  p{margin-bottom:10px;font-size:1.05rem}
+
+  .badge{display:inline-block;padding:5px 14px;border-radius:14px;font-weight:900;font-size:.78rem;letter-spacing:1px;text-transform:uppercase;background:linear-gradient(135deg,var(--gold),#F2C465);color:var(--navy);margin-bottom:8px}
+
+  .btn{padding:13px 26px;border-radius:14px;font-weight:900;border:none;cursor:pointer;font-family:inherit;font-size:1rem;transition:all .15s;display:inline-flex;align-items:center;gap:8px}
+  .btn-go{background:linear-gradient(135deg,var(--leaf),#3D8A30);color:#fff;box-shadow:0 4px 0 #2D6822}
+  .btn-go:hover{transform:translateY(-2px)}
+  .btn-back{background:#e5e7eb;color:#374151}
+  .btn-pri{background:linear-gradient(135deg,var(--berry),#9c2f5e);color:#fff}
+
+  .nav{display:flex;justify-content:space-between;align-items:center;margin-top:24px;gap:10px;flex-wrap:wrap}
+  .dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+  .dot{width:11px;height:11px;border-radius:50%;background:#cbd5e1;transition:all .2s}
+  .dot.on{background:var(--gold);transform:scale(1.4)}
+  .dot.done{background:var(--leaf)}
+
+  .mascot-row{display:flex;justify-content:center;gap:14px;font-size:3.2rem;margin:10px 0 18px;flex-wrap:wrap}
+  .mascot{display:inline-block;animation:bob 2.6s ease-in-out infinite}
+  .mascot:nth-child(2){animation-delay:.3s}
+  .mascot:nth-child(3){animation-delay:.6s}
+  .mascot:nth-child(4){animation-delay:.9s}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-12px) rotate(3deg)}}
+
+  .card{background:#FFFAEC;border:3px solid #FFE0A0;border-radius:18px;padding:16px;margin:12px 0}
+  .card-pink{background:#FFF0F6;border-color:#FFD3E2}
+  .card-sky{background:#EAF6FF;border-color:#C9E5FB}
+  .card-leaf{background:#EFFAE6;border-color:#C9EAB4}
+
+  .qbox{background:#fff;border:3px solid #E2E8F0;border-radius:18px;padding:18px;margin:14px 0;transition:border-color .25s}
+  .qbox.ok{border-color:var(--ok);background:#F0FBF3}
+  .qbox.bad{border-color:var(--bad);background:#FEF2F2}
+  .qprompt{font-weight:800;font-size:1.05rem;margin-bottom:12px;color:var(--navy)}
+  .opts{display:grid;grid-template-columns:1fr;gap:8px}
+  @media(min-width:600px){.opts{grid-template-columns:1fr 1fr}}
+  .opt{background:#fff;border:3px solid #cbd5e1;border-radius:12px;padding:12px 14px;font-weight:700;cursor:pointer;text-align:left;font-family:inherit;font-size:1rem;transition:all .15s}
+  .opt:hover{border-color:var(--gold);background:#FFF8E8;transform:translateY(-2px)}
+  .opt.right{background:#D9F7E1;border-color:var(--ok);color:#065f46}
+  .opt.wrong{background:#FFE2E2;border-color:var(--bad);color:#991b1b}
+  .opt:disabled{cursor:not-allowed}
+  .feedback{margin-top:10px;padding:12px;border-radius:10px;font-weight:700;font-size:.96rem;display:none}
+  .feedback.show{display:block}
+  .feedback.ok{background:#D9F7E1;color:#065f46}
+  .feedback.bad{background:#FFE2E2;color:#991b1b}
+
+  .fillrow{display:flex;align-items:center;gap:10px;margin:10px 0;flex-wrap:wrap;background:#FFFAEC;padding:10px 14px;border-radius:12px;border:2px dashed var(--apricot)}
+  .fillrow input{font-family:inherit;font-size:1.05rem;font-weight:800;padding:8px 12px;border:2px solid #cbd5e1;border-radius:9px;width:200px;text-align:left;background:#fff}
+  .fillrow input.ok{border-color:var(--ok);background:#D9F7E1}
+  .fillrow input.bad{border-color:var(--bad);background:#FFE2E2}
+  .checkbtn{padding:9px 18px;border-radius:10px;border:none;background:var(--berry);color:#fff;font-weight:900;cursor:pointer;font-family:inherit}
+
+  /* ===== Story passage ===== */
+  .passage{background:linear-gradient(180deg,#FFFAEC,#fff);border:3px dashed var(--apricot);border-radius:16px;padding:22px;margin:16px 0;font-family:'Patrick Hand',cursive;font-size:1.18rem;line-height:1.7;color:#3a3322;box-shadow:inset 0 0 30px rgba(224,172,60,.08)}
+  .passage h4{font-family:'Bangers',cursive;color:var(--berry);font-size:1.5rem;margin-bottom:10px;letter-spacing:1.5px}
+  .passage p{font-size:1.18rem;margin-bottom:10px}
+
+  .story-arc{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:14px 0}
+  @media(max-width:600px){.story-arc{grid-template-columns:1fr}}
+  .arc{padding:14px;border-radius:14px;text-align:center;font-weight:800;color:#fff}
+  .arc-1{background:linear-gradient(135deg,#86D464,#5DA85A)}
+  .arc-2{background:linear-gradient(135deg,#FFB675,#FF9447)}
+  .arc-3{background:linear-gradient(135deg,#C84B7C,#9c2f5e)}
+  .arc-emoji{font-size:2.6rem;display:block;margin-bottom:6px}
+
+  /* ===== Capitalization & punctuation ===== */
+  .punct-row{display:flex;justify-content:center;gap:14px;margin:14px 0;flex-wrap:wrap}
+  .punct-card{background:#fff;border:3px solid var(--gold);border-radius:14px;padding:16px;min-width:170px;text-align:center;font-weight:800}
+  .punct-card .big{font-family:'Bangers',cursive;font-size:3rem;color:var(--berry);display:block;margin-bottom:4px}
+
+  .adj-pool{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0;justify-content:center}
+  .adj{background:linear-gradient(135deg,#fff,#FFFAEC);border:3px solid #FFE0A0;padding:8px 14px;border-radius:24px;font-weight:800;cursor:pointer;transition:all .15s;font-size:1rem}
+  .adj:hover{transform:scale(1.06);background:#FFF6E1}
+  .adj.picked{background:var(--leaf);color:#fff;border-color:var(--leaf)}
+
+  /* ===== Confetti ===== */
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:200;display:none}
+  .conf-piece{position:absolute;width:10px;height:10px;animation:fall 1.6s linear forwards}
+  @keyframes fall{to{transform:translateY(100vh) rotate(720deg);opacity:0}}
+
+  #xover{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:150;pointer-events:none}
+  #xover.show{display:flex;animation:xpop .55s ease-out}
+  #xover .x{font-size:9rem;color:var(--bad);font-weight:900;text-shadow:0 0 24px rgba(220,38,38,.5)}
+  @keyframes xpop{0%{transform:scale(.3);opacity:0}40%{transform:scale(1.3);opacity:1}100%{transform:scale(1);opacity:0}}
+
+  .quote{font-style:italic;text-align:center;font-size:1.15rem;color:var(--navy);background:linear-gradient(135deg,#FFF6E1,#FFE9C7);padding:18px;border-radius:16px;border-left:6px solid var(--gold);margin:20px 0}
+
+  .review-grid{display:grid;grid-template-columns:1fr;gap:10px;margin:14px 0}
+  @media(min-width:600px){.review-grid{grid-template-columns:1fr 1fr}}
+  .review-card{background:linear-gradient(135deg,#FFF6E1,#fffaf0);border:3px solid #FFE0A0;border-radius:14px;padding:14px;font-weight:700}
+  .review-card strong{color:var(--berry);display:block;margin-bottom:4px}
+
+  .footer-tag{text-align:center;color:#64748b;font-size:.82rem;margin-top:14px;font-weight:700}
+</style>
+</head>
+<body>
+
+<!-- ===== HUD ===== -->
+<div class="hud">
+  <div class="hud-left">🦊 Bristol's Storybook — Unit 7</div>
+  <div class="hud-right">
+    <div class="stat"><span class="ico">⭐</span><span id="xpVal">0</span> XP</div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="stat"><span class="ico">🪙</span><span id="coinVal">0</span></div>
+    <div class="stat"><span class="ico">🏆</span> Lvl <span id="lvlVal">1</span></div>
+  </div>
+</div>
+
+<div class="wrap">
+<!-- ===== Slide 0: Welcome ===== -->
+<div class="slide active" id="s0">
+  <span class="badge">📚 Unit 7 · Story Adventure!</span>
+  <h1>🦊 Welcome Back, Bristol!</h1>
+  <div class="mascot-row">🦊 🐇 🐻 🦝 🦉</div>
+  <div class="card card-leaf">
+    <p style="font-size:1.1rem"><strong>Hello, story explorer!</strong> Last week you learned the parts of a story. This week we meet the <em>characters</em>, find the <em>setting</em>, and become word experts. Let's turn the page!</p>
+  </div>
+  <h3>🎯 What you'll learn today:</h3>
+  <div class="review-grid">
+    <div class="review-card"><strong>🧑 Characters & Setting</strong>Who is in the story and where</div>
+    <div class="review-card"><strong>🔢 Retell & Sequence</strong>First, next, then, last</div>
+    <div class="review-card"><strong>🏷️ Nouns</strong>Common and proper nouns</div>
+    <div class="review-card"><strong>🏃 Verbs</strong>Action words and past tense</div>
+  </div>
+  <div class="card card-pink">
+    <p>🎮 <strong>How to win XP:</strong> Get answers right to earn ⭐ XP and 🪙 coins. Tap an answer to lock it in!</p>
+  </div>
+  <div class="nav">
+    <span></span>
+    <button class="btn btn-go" onclick="go(1)">Let's Begin! 🚀</button>
+  </div>
+</div>
+<!-- ===== Slide 1: Review ===== -->
+<div class="slide" id="s1">
+  <span class="badge">🔁 Quick Review</span>
+  <h2>What we learned in Unit 6</h2>
+  <p>Let's warm up our word brains! 🧠✨</p>
+
+  <div class="qbox" data-q="r1">
+    <div class="qprompt">📖 Which part of a story tells how the problem is solved?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">The beginning</button>
+      <button class="opt" data-i="1" data-c="0">The middle</button>
+      <button class="opt" data-i="2" data-c="0">The title</button>
+      <button class="opt" data-i="3" data-c="1">The end</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="r2">
+    <div class="qprompt">🎯 The MAIN IDEA of a story is —</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">the first word</button>
+      <button class="opt" data-i="1" data-c="1">what the whole story is mostly about</button>
+      <button class="opt" data-i="2" data-c="0">the longest sentence</button>
+      <button class="opt" data-i="3" data-c="0">the last letter</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="r3">
+    <div class="qprompt">🔠 Which sentence uses capital letters CORRECTLY?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">my dog rex ran to florida.</button>
+      <button class="opt" data-i="1" data-c="0">My Dog rex ran To florida.</button>
+      <button class="opt" data-i="2" data-c="0">my Dog Rex Ran to Florida.</button>
+      <button class="opt" data-i="3" data-c="1">My dog Rex ran to Florida.</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="r4">
+    <div class="qprompt">❗ Which end mark belongs here: Watch out for the bee___</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">.</button>
+      <button class="opt" data-i="1" data-c="0">?</button>
+      <button class="opt" data-i="2" data-c="1">!</button>
+      <button class="opt" data-i="3" data-c="0">,</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="nav">
+    <button class="btn btn-back" onclick="go(0)">← Back</button>
+    <div class="dots" id="dots"></div>
+    <button class="btn btn-go" onclick="go(2)">Next: Characters! 🧑</button>
+  </div>
+</div>
+<!-- ===== Slide 2: Who and Where ===== -->
+<div class="slide" id="s2">
+  <span class="badge">🧑 Characters & Setting</span>
+  <h2>Who and Where</h2>
+  <p>Every story has <strong>characters</strong> (the people or animals) and a <strong>setting</strong> (where and when it happens). 🏞️</p>
+  <div class="card card-sky">
+    <h3>📖 Read this little story:</h3>
+    <p><strong>Finn the Fox and the Foggy Morning</strong><br>
+    Early one foggy morning, Finn the fox tiptoed through the green forest. He was looking for his lost red scarf. By the old oak tree, he met Pip, a friendly rabbit. Together they searched until the warm sun came out. There — hanging on a branch — was the red scarf!</p>
+  </div>
+  <div class="card card-leaf">
+    <h3>🧩 Story Detective</h3>
+    <p><strong>Characters</strong> = Finn the fox and Pip the rabbit.<br>
+    <strong>Setting</strong> = a green forest, early on a foggy morning.</p>
+  </div>
+  <div class="card card-pink">
+    <h3>✏️ Try it!</h3>
+    <p>In the story, WHERE does Finn search? Type the place. (one word)</p>
+    <div class="fillrow">
+      <span>Finn searches in the </span>
+      <input type="text" id="cs1" maxlength="6">
+      <button class="checkbtn" onclick="checkFill('cs1','forest','cs1fb')">Check</button>
+      <span id="cs1fb" style="font-weight:800"></span>
+    </div>
+  </div>
+
+  <div class="qbox" data-q="cs1">
+    <div class="qprompt">🦊 Who is the MAIN character in the story?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="1">Finn the fox</button>
+      <button class="opt" data-i="1" data-c="0">Pip the rabbit</button>
+      <button class="opt" data-i="2" data-c="0">the oak tree</button>
+      <button class="opt" data-i="3" data-c="0">the red scarf</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="cs2">
+    <div class="qprompt">🌤️ WHEN does the story take place?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">at midnight</button>
+      <button class="opt" data-i="1" data-c="0">during a snowstorm</button>
+      <button class="opt" data-i="2" data-c="1">early on a foggy morning</button>
+      <button class="opt" data-i="3" data-c="0">next summer</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="cs3">
+    <div class="qprompt">🏞️ The SETTING of a story tells us —</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">who the bad guy is</button>
+      <button class="opt" data-i="1" data-c="1">where and when it happens</button>
+      <button class="opt" data-i="2" data-c="0">the last word</button>
+      <button class="opt" data-i="3" data-c="0">how many pages</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="nav">
+    <button class="btn btn-back" onclick="go(1)">← Back</button>
+    <div class="dots"></div>
+    <button class="btn btn-go" onclick="go(3)">Next: Retell! 🔢</button>
+  </div>
+</div>
+<!-- ===== Slide 3: Telling the Story In Order ===== -->
+<div class="slide" id="s3">
+  <span class="badge">🔢 Retell & Sequence</span>
+  <h2>Telling the Story In Order</h2>
+  <p>When we <strong>retell</strong> a story, we tell the events in <strong>order</strong>. Order words help: <em>first, next, then, last</em>. ⏭️</p>
+  <div class="card card-leaf">
+    <h3>🗺️ Order Words</h3>
+    <div class="review-grid">
+      <div class="review-card"><strong>First</strong>The event that starts it all</div>
+      <div class="review-card"><strong>Next / Then</strong>What happens in the middle</div>
+      <div class="review-card"><strong>Last / Finally</strong>How the story ends</div>
+      <div class="review-card"><strong>Why?</strong>Order helps the reader follow along</div>
+    </div>
+  </div>
+  <div class="card card-sky">
+    <h3>🐇 Pip's Busy Day</h3>
+    <p><strong>First</strong>, Pip woke up in her cozy burrow. <strong>Next</strong>, she nibbled fresh clover for breakfast. <strong>Then</strong>, she hopped to the pond for a drink. <strong>Last</strong>, she curled up for an afternoon nap.</p>
+  </div>
+
+  <div class="qbox" data-q="rt1">
+    <div class="qprompt">🐇 What did Pip do FIRST?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">ate clover</button>
+      <button class="opt" data-i="1" data-c="0">hopped to the pond</button>
+      <button class="opt" data-i="2" data-c="0">took a nap</button>
+      <button class="opt" data-i="3" data-c="1">woke up in her burrow</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="rt2">
+    <div class="qprompt">⏭️ What happened LAST in Pip's day?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="1">she curled up for a nap</button>
+      <button class="opt" data-i="1" data-c="0">she woke up</button>
+      <button class="opt" data-i="2" data-c="0">she ate breakfast</button>
+      <button class="opt" data-i="3" data-c="0">she got a drink</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="rt3">
+    <div class="qprompt">🗣️ Which word tells you something happens in the MIDDLE of a story?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="1">then</button>
+      <button class="opt" data-i="1" data-c="0">first</button>
+      <button class="opt" data-i="2" data-c="0">last</button>
+      <button class="opt" data-i="3" data-c="0">finally</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="nav">
+    <button class="btn btn-back" onclick="go(2)">← Back</button>
+    <div class="dots"></div>
+    <button class="btn btn-go" onclick="go(4)">Next: Nouns! 🏷️</button>
+  </div>
+</div>
+<!-- ===== Slide 4: Common & Proper Nouns ===== -->
+<div class="slide" id="s4">
+  <span class="badge">🏷️ Nouns</span>
+  <h2>Common & Proper Nouns</h2>
+  <p>A <strong>noun</strong> is a person, place, animal, or thing. A <strong>proper noun</strong> names a SPECIFIC one — and it always starts with a capital letter! 🔠</p>
+  <div class="card card-pink">
+    <h3>🏷️ Two Kinds of Nouns</h3>
+    <div class="review-grid">
+      <div class="review-card"><strong>Common noun</strong>any one of a kind: dog, city, girl</div>
+      <div class="review-card"><strong>Proper noun</strong>a special name: Rex, Arcadia, Bristol</div>
+      <div class="review-card"><strong>Capital rule</strong>Proper nouns ALWAYS get a capital</div>
+      <div class="review-card"><strong>Examples</strong>fox → Finn &nbsp; · &nbsp; month → March</div>
+    </div>
+  </div>
+  <div class="card card-leaf">
+    <h3>✏️ Try it!</h3>
+    <p>Is the word <strong>"river"</strong> a common noun or a proper noun? (type one word)</p>
+    <div class="fillrow">
+      <span>The word river is a </span>
+      <input type="text" id="n1" maxlength="6">
+      <button class="checkbtn" onclick="checkFill('n1','common','n1fb')">Check</button>
+      <span id="n1fb" style="font-weight:800"></span>
+    </div>
+  </div>
+
+  <div class="qbox" data-q="n1">
+    <div class="qprompt">🏷️ Which word is a PROPER noun?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">state</button>
+      <button class="opt" data-i="1" data-c="1">Florida</button>
+      <button class="opt" data-i="2" data-c="0">puppy</button>
+      <button class="opt" data-i="3" data-c="0">school</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="n2">
+    <div class="qprompt">📍 Which word is a COMMON noun?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">Bristol</button>
+      <button class="opt" data-i="1" data-c="0">Tuesday</button>
+      <button class="opt" data-i="2" data-c="1">forest</button>
+      <button class="opt" data-i="3" data-c="0">Pip</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="n3">
+    <div class="qprompt">🔠 Which proper noun is written CORRECTLY?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="1">My friend Maya</button>
+      <button class="opt" data-i="1" data-c="0">my friend maya</button>
+      <button class="opt" data-i="2" data-c="0">My friend maya</button>
+      <button class="opt" data-i="3" data-c="0">my Friend Maya</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="nav">
+    <button class="btn btn-back" onclick="go(3)">← Back</button>
+    <div class="dots"></div>
+    <button class="btn btn-go" onclick="go(5)">Next: Verbs! 🏃</button>
+  </div>
+</div>
+<!-- ===== Slide 5: Action Words & Past Tense ===== -->
+<div class="slide" id="s5">
+  <span class="badge">🏃 Verbs</span>
+  <h2>Action Words & Past Tense</h2>
+  <p>A <strong>verb</strong> is an action word — it tells what someone DOES. When the action already happened, we use <strong>past tense</strong> (often by adding <em>-ed</em>). 🏃</p>
+  <div class="card card-leaf">
+    <h3>🏃 Verbs in Action</h3>
+    <p>Finn <strong>runs</strong>. Pip <strong>hops</strong>. The owl <strong>flies</strong>. The bear <strong>sleeps</strong>.</p>
+    <div class="review-grid">
+      <div class="review-card"><strong>Now (present)</strong>jump, play, walk</div>
+      <div class="review-card"><strong>Already happened (past)</strong>jumped, played, walked</div>
+      <div class="review-card"><strong>The trick</strong>Many verbs add <em>-ed</em> for past tense</div>
+      <div class="review-card"><strong>Watch out</strong>Some change fully: run → ran, go → went</div>
+    </div>
+  </div>
+  <div class="card card-pink">
+    <h3>✏️ Try it!</h3>
+    <p>Change this verb to PAST TENSE: <strong>"walk"</strong> becomes —</p>
+    <div class="fillrow">
+      <span>Yesterday I </span>
+      <input type="text" id="v1" maxlength="6">
+      <button class="checkbtn" onclick="checkFill('v1','walked','v1fb')">Check</button>
+      <span id="v1fb" style="font-weight:800"></span>
+    </div>
+  </div>
+
+  <div class="qbox" data-q="v1">
+    <div class="qprompt">🏃 Which word is a VERB (action word)?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">happy</button>
+      <button class="opt" data-i="1" data-c="1">skip</button>
+      <button class="opt" data-i="2" data-c="0">blue</button>
+      <button class="opt" data-i="3" data-c="0">table</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="v2">
+    <div class="qprompt">⏪ What is the PAST TENSE of "play"?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">plays</button>
+      <button class="opt" data-i="1" data-c="0">playing</button>
+      <button class="opt" data-i="2" data-c="1">played</button>
+      <button class="opt" data-i="3" data-c="0">play</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="v3">
+    <div class="qprompt">🐻 Which sentence is in the PAST tense?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">The bear naps in the cave.</button>
+      <button class="opt" data-i="1" data-c="0">The bear is napping.</button>
+      <button class="opt" data-i="2" data-c="0">The bear will nap.</button>
+      <button class="opt" data-i="3" data-c="1">The bear napped in the cave.</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="nav">
+    <button class="btn btn-back" onclick="go(4)">← Back</button>
+    <div class="dots"></div>
+    <button class="btn btn-go" onclick="go(6)">Next: Commas! ✏️</button>
+  </div>
+</div>
+<!-- ===== Slide 6: Commas in Lists & Dates ===== -->
+<div class="slide" id="s6">
+  <span class="badge">✏️ Commas</span>
+  <h2>Commas in Lists & Dates</h2>
+  <p>A <strong>comma</strong> is a tiny pause. We use commas to separate items in a <strong>list</strong> and to separate the day from the year in a <strong>date</strong>. ✏️</p>
+  <div class="card card-sky">
+    <h3>✏️ Two Comma Jobs</h3>
+    <div class="review-grid">
+      <div class="review-card"><strong>In a list</strong>Finn packed a scarf, a snack, and a map.</div>
+      <div class="review-card"><strong>In a date</strong>July 4, 2026</div>
+      <div class="review-card"><strong>List rule</strong>A comma after every item except the last</div>
+      <div class="review-card"><strong>Date rule</strong>A comma goes between the day and the year</div>
+    </div>
+  </div>
+  <div class="card card-leaf">
+    <h3>✏️ Try it!</h3>
+    <p>In the date <strong>March 9 2026</strong>, the comma goes right after which number? (type the number)</p>
+    <div class="fillrow">
+      <span>The comma goes after the </span>
+      <input type="text" id="cm1" maxlength="6">
+      <button class="checkbtn" onclick="checkFill('cm1','9','cm1fb')">Check</button>
+      <span id="cm1fb" style="font-weight:800"></span>
+    </div>
+  </div>
+
+  <div class="qbox" data-q="cm1">
+    <div class="qprompt">✏️ Which sentence uses list commas CORRECTLY?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">Pip likes clover carrots and grass.</button>
+      <button class="opt" data-i="1" data-c="0">Pip likes, clover carrots grass.</button>
+      <button class="opt" data-i="2" data-c="1">Pip likes clover, carrots, and grass.</button>
+      <button class="opt" data-i="3" data-c="0">Pip, likes clover carrots and grass.</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="cm2">
+    <div class="qprompt">📅 Which date is written CORRECTLY?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">May 21 2026</button>
+      <button class="opt" data-i="1" data-c="1">May 21, 2026</button>
+      <button class="opt" data-i="2" data-c="0">May, 21 2026</button>
+      <button class="opt" data-i="3" data-c="0">May 21 2026,</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="cm3">
+    <div class="qprompt">🧩 A comma is like a —</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">loud shout</button>
+      <button class="opt" data-i="1" data-c="0">capital letter</button>
+      <button class="opt" data-i="2" data-c="1">tiny pause for the reader</button>
+      <button class="opt" data-i="3" data-c="0">question</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="nav">
+    <button class="btn btn-back" onclick="go(5)">← Back</button>
+    <div class="dots"></div>
+    <button class="btn btn-go" onclick="go(7)">Final Quiz! 🏆</button>
+  </div>
+</div>
+<!-- ===== Slide 7: Final Quiz ===== -->
+<div class="slide" id="s7">
+  <span class="badge">🏆 Final Challenge</span>
+  <h2>Show What You Know!</h2>
+  <p>A mix of everything from today — you've got this, story explorer! 🦊💪</p>
+
+  <div class="qbox" data-q="f1">
+    <div class="qprompt">🧑 The CHARACTERS of a story are —</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">where it happens</button>
+      <button class="opt" data-i="1" data-c="1">the people or animals in it</button>
+      <button class="opt" data-i="2" data-c="0">the last page</button>
+      <button class="opt" data-i="3" data-c="0">the title</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="f2">
+    <div class="qprompt">⏭️ Which order word tells how a story ENDS?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">first</button>
+      <button class="opt" data-i="1" data-c="0">next</button>
+      <button class="opt" data-i="2" data-c="0">then</button>
+      <button class="opt" data-i="3" data-c="1">finally</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="f3">
+    <div class="qprompt">🏷️ Which word is a PROPER noun?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="1">Bristol</button>
+      <button class="opt" data-i="1" data-c="0">girl</button>
+      <button class="opt" data-i="2" data-c="0">town</button>
+      <button class="opt" data-i="3" data-c="0">river</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="f4">
+    <div class="qprompt">🏃 What is the PAST TENSE of "jump"?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">jumps</button>
+      <button class="opt" data-i="1" data-c="1">jumped</button>
+      <button class="opt" data-i="2" data-c="0">jumping</button>
+      <button class="opt" data-i="3" data-c="0">jump</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="f5">
+    <div class="qprompt">✏️ Which sentence uses commas CORRECTLY?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="1">I see a fox, a bird, and a deer.</button>
+      <button class="opt" data-i="1" data-c="0">I see a fox a bird and a deer.</button>
+      <button class="opt" data-i="2" data-c="0">I see a, fox bird and deer.</button>
+      <button class="opt" data-i="3" data-c="0">I, see a fox bird and deer.</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="f6">
+    <div class="qprompt">🏞️ The SETTING tells the reader —</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="1">where and when the story happens</button>
+      <button class="opt" data-i="1" data-c="0">who wins</button>
+      <button class="opt" data-i="2" data-c="0">the spelling words</button>
+      <button class="opt" data-i="3" data-c="0">how long the book is</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="f7">
+    <div class="qprompt">🔠 Which word should ALWAYS start with a capital letter?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">puppy</button>
+      <button class="opt" data-i="1" data-c="0">morning</button>
+      <button class="opt" data-i="2" data-c="0">scarf</button>
+      <button class="opt" data-i="3" data-c="1">Arcadia</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="nav">
+    <button class="btn btn-back" onclick="go(6)">← Back</button>
+    <div class="dots"></div>
+    <button class="btn btn-go" onclick="go(8)">Finish! 🏆</button>
+  </div>
+</div>
+<!-- ===== Slide 8: Finale ===== -->
+<div class="slide" id="s8">
+  <span class="badge">🌟 You Did It!</span>
+  <h1 style="text-align:center">🎉 Wonderful Work, Bristol! 🎉</h1>
+  <div class="mascot-row">🦊 🐇 🐻 🦝 🦉</div>
+  <div class="card card-leaf" style="text-align:center">
+    <h2>Your Final Score</h2>
+    <p style="font-size:2.4rem;font-family:'Bangers',cursive;color:var(--navy)">⭐ <span id="finalXP">0</span> XP · 🪙 <span id="finalCoins">0</span> coins</p>
+    <p style="font-size:1.2rem;font-weight:800;color:var(--berry)" id="finalLvl">Champion!</p>
+  </div>
+  <div class="quote">
+    "Every great story starts with a curious reader who asks who, where, and what happens next. That curious reader is YOU, Bristol."<br><strong>— Coach Jonathan, KingCretot Experience</strong>
+  </div>
+  <div class="card card-pink" style="text-align:center">
+    <h3>📝 Your Mission Tonight:</h3>
+    <p>Complete your <strong>Unit 7 Post-Lesson Activity Packet</strong> with a parent or grown-up!</p>
+  </div>
+  <div class="footer-tag">🦊 KingCretot Experience · Bristol's Storybook Quest · Unit 7 🦊</div>
+</div>
+
+</div><!-- /wrap -->
+
+<!-- ===== Effects ===== -->
+<div id="confetti"></div>
+<div id="xover"><div class="x">✕</div></div>
+<script>
+/* ============ State ============ */
+const state = { xp:0, coins:0, lvl:1, answered:{} };
+const SLIDES = 9;
+const FINALE = 8;
+
+function updateHud(){
+  document.getElementById('xpVal').textContent = state.xp;
+  document.getElementById('coinVal').textContent = state.coins;
+  document.getElementById('lvlVal').textContent = state.lvl;
+  const pct = Math.min(100, (state.xp % 100));
+  document.getElementById('xpFill').style.width = pct + '%';
+  if (state.xp >= state.lvl * 100) state.lvl++;
+}
+function addXP(n){ state.xp += n; updateHud(); }
+function addCoins(n){ state.coins += n; updateHud(); }
+
+/* ============ Navigation ============ */
+function go(i){
+  document.querySelectorAll('.slide').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s'+i).classList.add('active');
+  buildDots(i);
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(i === FINALE) showFinal();
+}
+function buildDots(active){
+  document.querySelectorAll('.dots').forEach(d=>{
+    d.innerHTML = '';
+    for (let k=0; k<SLIDES; k++){
+      const dot = document.createElement('div');
+      dot.className = 'dot' + (k===active?' on':'') + (k<active?' done':'');
+      d.appendChild(dot);
+    }
+  });
+}
+
+/* ============ Sound (Web Audio) ============ */
+let audioCtx;
+function getCtx(){
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+function playRight(){
+  const c = getCtx();
+  [523, 659, 784, 1047].forEach((f,i)=>{
+    const o = c.createOscillator(), g = c.createGain();
+    o.type='sine'; o.frequency.value=f;
+    g.gain.setValueAtTime(0,c.currentTime+i*0.08);
+    g.gain.linearRampToValueAtTime(0.18,c.currentTime+i*0.08+0.02);
+    g.gain.linearRampToValueAtTime(0,c.currentTime+i*0.08+0.18);
+    o.connect(g); g.connect(c.destination);
+    o.start(c.currentTime+i*0.08); o.stop(c.currentTime+i*0.08+0.2);
+  });
+}
+function playWrong(){
+  const c = getCtx();
+  const o = c.createOscillator(), g = c.createGain();
+  o.type='sawtooth'; o.frequency.setValueAtTime(220, c.currentTime);
+  o.frequency.linearRampToValueAtTime(80, c.currentTime+0.4);
+  g.gain.setValueAtTime(0.16, c.currentTime);
+  g.gain.linearRampToValueAtTime(0, c.currentTime+0.4);
+  o.connect(g); g.connect(c.destination);
+  o.start(); o.stop(c.currentTime+0.4);
+}
+
+/* ============ Confetti ============ */
+function confetti(){
+  const root = document.getElementById('confetti');
+  root.style.display = 'block';
+  const colors = ['#E0AC3C','#FF9447','#86D464','#7CC6FF','#FFB7D5','#E85D2C','#0E9F9A','#6F3F8F'];
+  for (let i=0; i<70; i++){
+    const p = document.createElement('div');
+    p.className = 'conf-piece';
+    p.style.left = Math.random()*100 + '%';
+    p.style.top = -10 + 'px';
+    p.style.background = colors[Math.floor(Math.random()*colors.length)];
+    p.style.animationDelay = (Math.random()*0.4) + 's';
+    p.style.animationDuration = (1.2 + Math.random()*1.2) + 's';
+    p.style.borderRadius = (Math.random()>0.5 ? '50%' : '2px');
+    root.appendChild(p);
+  }
+  setTimeout(()=>{ root.innerHTML=''; root.style.display='none'; }, 2400);
+}
+function flashX(){
+  const x = document.getElementById('xover');
+  x.classList.add('show');
+  setTimeout(()=>x.classList.remove('show'), 600);
+}
+
+/* ============ MC Quiz registry (single delegate) ============ */
+document.addEventListener('click', e=>{
+  const opt = e.target.closest('.opt');
+  if (!opt) return;
+  const box = opt.closest('.qbox');
+  if (!box) return;
+  const qid = box.dataset.q;
+  if (state.answered[qid]) return;
+  const correct = opt.dataset.c === '1';
+  const fb = box.querySelector('.feedback');
+  box.querySelectorAll('.opt').forEach(b=>b.disabled=true);
+  if (correct){
+    opt.classList.add('right');
+    box.classList.add('ok');
+    fb.textContent = '🎉 Correct! Great thinking!';
+    fb.className = 'feedback show ok';
+    addXP(10); addCoins(2);
+    playRight(); confetti();
+  } else {
+    opt.classList.add('wrong');
+    box.classList.add('bad');
+    box.querySelectorAll('.opt').forEach(b=>{
+      if (b.dataset.c === '1') b.classList.add('right');
+    });
+    fb.textContent = '❌ Not quite — see the green answer above. Keep going, you have got this!';
+    fb.className = 'feedback show bad';
+    playWrong(); flashX();
+  }
+  state.answered[qid] = true;
+});
+
+/* ============ Fill-in ============ */
+function checkFill(inputId, correct, fbId){
+  const inp = document.getElementById(inputId);
+  const fb = document.getElementById(fbId);
+  if (state.answered['fill-'+inputId]) return;
+  const val = inp.value.trim().toLowerCase();
+  if (val === String(correct).toLowerCase()){
+    inp.classList.add('ok'); inp.disabled = true;
+    fb.textContent = '✅ Yes! ' + correct;
+    fb.style.color = 'var(--ok)';
+    addXP(8); addCoins(2);
+    playRight(); confetti();
+    state.answered['fill-'+inputId] = true;
+  } else {
+    inp.classList.add('bad');
+    fb.textContent = '❌ Try again!';
+    fb.style.color = 'var(--bad)';
+    playWrong(); flashX();
+    setTimeout(()=>{ inp.classList.remove('bad'); fb.textContent=''; }, 1500);
+  }
+}
+
+/* ============ Final ============ */
+function showFinal(){
+  document.getElementById('finalXP').textContent = state.xp;
+  document.getElementById('finalCoins').textContent = state.coins;
+  let title = 'Story Star! 🏆';
+  if (state.xp >= 200) title = 'Storybook MASTER! 🌟';
+  else if (state.xp >= 120) title = 'Word Wizard! ✨';
+  else if (state.xp >= 60) title = 'Rising Reader! ⭐';
+  document.getElementById('finalLvl').textContent = title;
+  setTimeout(confetti, 300);
+  setTimeout(confetti, 1200);
+}
+
+updateHud();
+buildDots(0);
+</script>
+</body>
+</html>
