@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<title>KCE Summer 2026 • Bristol • Math 2b • Number Detective Agency</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{font-family:'Nunito',sans-serif;font-size:18px;background:linear-gradient(160deg,#2C3E66 0%,#3D5488 45%,#52688F 100%);color:#1B2C5C;min-height:100vh}
+body{padding-bottom:60px}
+header.kce{background:linear-gradient(90deg,#1B2C5C,#0B1F4A);color:#fff;padding:14px 24px;border-bottom:5px solid #E0AC3C;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:50;box-shadow:0 4px 16px rgba(0,0,0,.4)}
+header.kce .brand{font-family:'Fredoka One',cursive;font-size:21px;letter-spacing:1px}
+header.kce .brand small{display:block;font-size:11px;color:#FFE6A8;letter-spacing:2px;margin-top:2px;font-family:'Nunito'}
+.hud{display:flex;gap:12px;align-items:center;font-weight:800}
+.hud .pill{background:rgba(255,255,255,.15);border:1px solid #FFE6A8;border-radius:18px;padding:5px 13px;font-size:15px;color:#fff;display:flex;gap:6px;font-family:'Fredoka One',cursive}
+.hud .pill .v{color:#FFE6A8;min-width:22px;text-align:right}
+.xpbar{height:7px;background:rgba(255,255,255,.2);border-radius:4px;width:110px;overflow:hidden}
+.xpbar .fill{height:100%;width:0%;background:linear-gradient(90deg,#FFE6A8,#E0AC3C);transition:width .6s}
+main{max-width:1080px;margin:24px auto;padding:0 20px}
+.title-card{background:linear-gradient(135deg,#fff 0%,#EEF2FA 100%);border-radius:22px;padding:30px 26px;text-align:center;border:4px solid #E0AC3C;position:relative;overflow:hidden;box-shadow:0 12px 32px rgba(0,0,0,.3)}
+.title-card::before{content:"🔍";position:absolute;top:-14px;left:-10px;font-size:130px;opacity:.09;transform:rotate(-12deg)}
+.title-card::after{content:"🕵";position:absolute;bottom:-22px;right:-10px;font-size:130px;opacity:.09;transform:rotate(10deg)}
+.title-card h1{font-family:'Fredoka One',cursive;font-size:38px;color:#1B2C5C;letter-spacing:1px;margin-bottom:8px}
+.title-card .sub{font-size:17px;color:#C99A2E;font-weight:800;margin-bottom:6px;font-family:'Fredoka One',cursive}
+.title-card .stand{display:inline-block;background:#1B2C5C;color:#FFE6A8;padding:6px 16px;border-radius:18px;font-size:12px;font-weight:700;margin-top:10px}
+.badge{display:inline-block;background:#E0AC3C;color:#1B2C5C;font-family:'Fredoka One',cursive;font-size:13px;padding:5px 14px;border-radius:14px;margin-top:8px}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:20px 0 14px;justify-content:center}
+.tab{background:#fff;border:3px solid #E0AC3C;color:#1B2C5C;font-family:'Fredoka One',cursive;font-size:13px;padding:9px 13px;border-radius:30px;cursor:pointer;transition:.2s}
+.tab:hover{transform:translateY(-2px)}
+.tab.active{background:#E0AC3C;color:#1B2C5C;box-shadow:0 4px 14px rgba(224,172,60,.5)}
+.tab.done{background:#5FB3B3;color:#fff;border-color:#5FB3B3}
+.tab.done::before{content:"🔎 "}
+.card{background:#fff;border-radius:20px;padding:28px;box-shadow:0 10px 36px rgba(0,0,0,.2);margin-bottom:22px;border:3px solid #EEF2FA;display:none}
+.card.active{display:block;animation:fadeUp .5s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.card h2{font-family:'Fredoka One',cursive;color:#1B2C5C;font-size:28px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.card .lead{font-size:17px;color:#2A3A5A;margin-bottom:18px;background:#EEF2FA;border-left:5px solid #E0AC3C;padding:14px 18px;border-radius:12px;line-height:1.6}
+.card .lead b{color:#C99A2E;font-weight:800}
+.card h3{font-family:'Fredoka One',cursive;color:#E0AC3C;font-size:19px;margin:20px 0 10px}
+.review-banner{background:linear-gradient(135deg,#FFE6A8,#E0AC3C);color:#1B2C5C;padding:14px 18px;border-radius:14px;margin:10px 0;font-weight:700;border:2px dashed #1B2C5C}
+.review-banner .l{font-family:'Fredoka One',cursive;font-size:15px;letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:4px}
+/* CLUE / MYSTERY */
+.case-file{background:#FFF9E6;border:3px solid #E0AC3C;border-radius:14px;padding:18px;margin:14px 0}
+.case-file .ct{font-family:'Fredoka One',cursive;color:#1B2C5C;font-size:18px;margin-bottom:10px}
+.clue{background:#fff;border:2px solid #5FB3B3;border-radius:10px;padding:10px 14px;margin:8px 0;font-weight:700;color:#1B2C5C;display:flex;gap:10px;align-items:center}
+.clue .ci{font-size:22px}
+.numgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(80px,1fr));gap:10px;margin:14px 0}
+.numcard{background:linear-gradient(135deg,#EEF2FA,#D8E0F0);border:3px solid #3D5488;border-radius:12px;padding:16px 8px;text-align:center;font-family:'Fredoka One',cursive;font-size:24px;color:#1B2C5C;cursor:pointer;transition:.15s;user-select:none}
+.numcard:hover{transform:scale(1.07);border-color:#E0AC3C}
+.numcard.correct{background:linear-gradient(135deg,#5FB3B3,#3B8E8E);color:#fff;border-color:#2A7A5A;animation:pop .5s}
+.numcard.wrong{background:#FFAEAE;color:#fff;border-color:#D44;animation:shake .4s}
+.numcard.eliminated{opacity:.3;text-decoration:line-through;cursor:default}
+/* MATCHING */
+.match-wrap{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:14px 0}
+.match-col{display:flex;flex-direction:column;gap:8px}
+.match-col .ml{font-family:'Fredoka One',cursive;text-align:center;color:#3D5488;font-size:14px;margin-bottom:4px}
+.mitem{background:#fff;border:3px solid #3D5488;border-radius:10px;padding:12px;font-weight:800;color:#1B2C5C;cursor:pointer;transition:.15s;text-align:center;font-size:17px}
+.mitem:hover{border-color:#E0AC3C;background:#FFF9E6}
+.mitem.sel{border-color:#E0AC3C;background:#FFE6A8;transform:scale(1.03)}
+.mitem.matched{background:#5FB3B3;color:#fff;border-color:#2A7A5A;cursor:default;pointer-events:none}
+/* SORTING */
+.sort-pool{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:14px 0;min-height:50px;padding:10px;background:#EEF2FA;border-radius:12px}
+.sort-item{background:#fff;border:3px solid #3D5488;border-radius:10px;padding:10px 16px;font-family:'Fredoka One',cursive;font-size:18px;color:#1B2C5C;cursor:pointer;transition:.15s}
+.sort-item:hover{transform:scale(1.06);border-color:#E0AC3C}
+.sort-item.sel{border-color:#E0AC3C;background:#FFE6A8}
+.sort-bins{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0}
+.sbin{background:#EEF2FA;border:3px dashed #3D5488;border-radius:14px;padding:14px;min-height:90px}
+.sbin .bl{font-family:'Fredoka One',cursive;text-align:center;color:#1B2C5C;font-size:15px;margin-bottom:8px}
+.sbin .holder{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.sbin .chip{background:#5FB3B3;color:#fff;border-radius:8px;padding:6px 12px;font-weight:800;font-size:15px}
+.sbin .chip.bad{background:#FFAEAE}
+.q{background:#FFF9E6;border:3px solid #FFE6A8;border-radius:14px;padding:18px;margin:14px 0;border-left:6px solid #E0AC3C}
+.q .qnum{display:inline-block;background:#E0AC3C;color:#1B2C5C;font-family:'Fredoka One',cursive;font-size:14px;padding:4px 12px;border-radius:12px;margin-right:8px}
+.q .qtxt{font-size:19px;font-weight:700;color:#1B2C5C;margin:6px 0 12px;display:inline}
+.q .opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.q .opt{background:#fff;border:3px solid #5FB3B3;border-radius:14px;padding:14px;font-size:19px;font-weight:700;cursor:pointer;transition:.2s;text-align:left;color:#1B2C5C}
+.q .opt:hover{border-color:#E0AC3C;background:#FFF9E6;transform:translateY(-2px)}
+.q .opt.correct{background:#5FB3B3;color:#fff;border-color:#2A7A5A;animation:pop .5s}
+.q .opt.wrong{background:#FFAEAE;color:#fff;border-color:#D44;animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.08)}100%{transform:scale(1)}}
+.q .fb{margin-top:10px;padding:10px 14px;border-radius:10px;display:none;font-weight:700;font-size:16px}
+.q .fb.ok{background:#D4F1E8;color:#2A7A5A;display:block;border:2px solid #5FB3B3}
+.q .fb.no{background:#FFE0E0;color:#A02828;display:block;border:2px dashed #D44}
+.brain{background:linear-gradient(135deg,#1B2C5C,#3D5488);color:#fff;border-radius:14px;padding:18px;margin:14px 0;border:3px solid #E0AC3C}
+.brain .bt{font-family:'Fredoka One',cursive;color:#FFE6A8;font-size:18px;margin-bottom:8px}
+.brain .q{background:rgba(255,255,255,.95)}
+.btn{background:linear-gradient(135deg,#E0AC3C,#C99A2E);color:#1B2C5C;font-family:'Fredoka One',cursive;font-size:16px;padding:12px 24px;border:none;border-radius:30px;cursor:pointer;letter-spacing:1px;transition:.15s;box-shadow:0 4px 12px rgba(224,172,60,.4)}
+.btn:hover{transform:translateY(-2px)}
+.btn.next{background:linear-gradient(135deg,#5FB3B3,#3B8E8E);color:#fff}
+.btn.ghost{background:#fff;color:#1B2C5C;border:3px solid #E0AC3C;box-shadow:none}
+.nav-row{display:flex;justify-content:space-between;margin-top:18px;gap:10px}
+.tool-msg{text-align:center;font-family:'Fredoka One',cursive;font-size:16px;padding:10px;border-radius:10px;margin:10px 0;display:none}
+.tool-msg.win{background:#D4F1E8;color:#2A7A5A;display:block;animation:pop .5s}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:200}
+.confetti-piece{position:absolute;width:10px;height:14px;opacity:.9}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
+footer.kce{position:fixed;bottom:0;left:0;right:0;background:#1B2C5C;color:#fff;padding:8px 24px;border-top:3px solid #E0AC3C;font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;z-index:40;font-family:'Fredoka One',cursive;letter-spacing:1px}
+footer.kce .gradelvl{color:#FFE6A8}
+footer.kce .contact{color:#FFE6A8;text-align:right}
+.victory{display:none;background:linear-gradient(135deg,#FFE6A8,#E0AC3C);border:4px solid #1B2C5C;border-radius:20px;padding:30px;text-align:center;margin:18px 0;box-shadow:0 12px 36px rgba(0,0,0,.3)}
+.victory.show{display:block;animation:fadeUp .6s}
+.victory h2{font-family:'Fredoka One',cursive;color:#1B2C5C;font-size:30px;margin-bottom:10px}
+.victory .crown{font-size:60px;margin:8px 0}
+.victory .quote{background:#fff;border-radius:14px;padding:18px;margin-top:14px;color:#1B2C5C;font-size:16px;font-style:italic;border-left:5px solid #5FB3B3}
+.victory .quote .who{display:block;font-style:normal;font-weight:800;color:#C99A2E;margin-top:8px;font-family:'Fredoka One',cursive}
+.progress-dots{display:flex;justify-content:center;gap:8px;margin:14px 0}
+.dot{width:13px;height:13px;border-radius:50%;background:rgba(255,255,255,.4);border:2px solid #FFE6A8;transition:.3s}
+.dot.done{background:#5FB3B3;border-color:#fff}
+.dot.cur{background:#E0AC3C;border-color:#fff;box-shadow:0 0 10px #E0AC3C;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.3)}}
+@media(max-width:680px){.title-card h1{font-size:28px}.q .opts{grid-template-columns:1fr}.match-wrap,.sort-bins{grid-template-columns:1fr}}
+</style></head>
+<body>
+<header class="kce">
+  <div class="brand">KCE 🔍 DETECTIVE AGENCY<small>SUMMER 2026 • WEEK 2b MATH</small></div>
+  <div class="hud">
+    <div class="pill">🔎 <span class="v" id="hudXp">0</span></div>
+    <div class="pill">🏅 <span class="v" id="hudCoin">0</span></div>
+    <div class="pill">RANK <span class="v" id="hudLvl">1</span></div>
+    <div class="xpbar"><div class="fill" id="hudBar"></div></div>
+  </div>
+</header>
+
+<main>
+  <div class="title-card">
+    <h1>🔍 Number Detective Agency 🕵</h1>
+    <div class="sub">BRISTOL • GRADE 2 • WEEK 2b • EXTENSION CASE</div>
+    <p style="color:#2A3A5A;font-size:16px;margin-top:6px">Crack number mysteries, spot patterns, and solve tricky cases — Detective Bristol is on duty!</p>
+    <span class="badge">⭐ CHALLENGE LEVEL: SENIOR DETECTIVE</span><br>
+    <span class="stand">Florida B.E.S.T.: MA.2.NSO.1.1 • MA.2.NSO.1.2 • MA.2.NSO.1.4 • MA.2.AR.1</span>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-go="s0">🗂 Case Review</button>
+    <button class="tab" data-go="s1">🔦 Mystery Numbers</button>
+    <button class="tab" data-go="s2">🧩 Pattern Patrol</button>
+    <button class="tab" data-go="s3">📋 The Lineup</button>
+    <button class="tab" data-go="s4">🎯 Rounding Squad</button>
+    <button class="tab" data-go="s5">🏆 Master Case</button>
+  </div>
+
+  <div class="progress-dots" id="dots">
+    <div class="dot cur"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>
+
+  <!-- S0 REVIEW -->
+  <section class="card active" id="s0">
+    <h2><span>🗂</span>Case Review — Tropical Beach Files</h2>
+    <div class="review-banner">
+      <span class="l">Detective Briefing</span>
+      In your last case at <b>Tropical Beach</b> you mastered <b>place value to 1,000</b>, <b>expanded form</b>, and <b>comparing 3-digit numbers</b>. Today the cases get TRICKIER. A real detective uses what they already know to crack new mysteries. Let&rsquo;s warm up!
+    </div>
+
+    <div class="q"><span class="qnum">R1</span><span class="qtxt">In the number <b>538</b>, the digit 5 is worth:</span>
+      <div class="opts" data-correct="2">
+        <button class="opt" data-i="0">5 ones</button>
+        <button class="opt" data-i="1">5 tens</button>
+        <button class="opt" data-i="2">5 hundreds (500)</button>
+        <button class="opt" data-i="3">53</button>
+      </div><div class="fb"></div></div>
+
+    <div class="q"><span class="qnum">R2</span><span class="qtxt">Which sign makes this true: <b>674 ___ 647</b>?</span>
+      <div class="opts" data-correct="0">
+        <button class="opt" data-i="0">&gt; (greater than)</button>
+        <button class="opt" data-i="1">&lt; (less than)</button>
+        <button class="opt" data-i="2">= (equal)</button>
+        <button class="opt" data-i="3">+ (plus)</button>
+      </div><div class="fb"></div></div>
+
+    <div class="q"><span class="qnum">R3</span><span class="qtxt">What is <b>300 + 60 + 9</b> in standard form?</span>
+      <div class="opts" data-correct="3">
+        <button class="opt" data-i="0">3,609</button>
+        <button class="opt" data-i="1">396</button>
+        <button class="opt" data-i="2">3,069</button>
+        <button class="opt" data-i="3">369</button>
+      </div><div class="fb"></div></div>
+
+    <div class="nav-row"><span></span><button class="btn next" data-go="s1">Open first case 🔦 →</button></div>
+  </section>
+
+  <!-- S1 MYSTERY NUMBERS -->
+  <section class="card" id="s1">
+    <h2><span>🔦</span>Mystery Numbers</h2>
+    <div class="lead">A real detective reads <b>every clue</b> before deciding. For each case, read all the clues, then click the number card that fits them ALL. Use the clues to <b>eliminate</b> wrong suspects first!</div>
+
+    <h3>🗃 Case #1 — The Missing House Number</h3>
+    <div class="case-file">
+      <div class="ct">Clues:</div>
+      <div class="clue"><span class="ci">1️⃣</span> The number has a <b>4 in the hundreds place</b>.</div>
+      <div class="clue"><span class="ci">2️⃣</span> The number is <b>greater than 450</b>.</div>
+      <div class="clue"><span class="ci">3️⃣</span> The <b>ones digit is 7</b>.</div>
+    </div>
+    <div class="numgrid" data-mystery="457">
+      <div class="numcard" data-n="427">427</div>
+      <div class="numcard" data-n="457">457</div>
+      <div class="numcard" data-n="367">367</div>
+      <div class="numcard" data-n="475">475</div>
+    </div>
+    <div class="tool-msg" id="m1">🎉 Case closed, Detective! The answer is 457.</div>
+
+    <h3>🗃 Case #2 — The Secret Locker</h3>
+    <div class="case-file">
+      <div class="ct">Clues:</div>
+      <div class="clue"><span class="ci">1️⃣</span> It is an <b>even number</b>.</div>
+      <div class="clue"><span class="ci">2️⃣</span> It has <b>8 tens</b>.</div>
+      <div class="clue"><span class="ci">3️⃣</span> It is <b>between 280 and 290</b>.</div>
+    </div>
+    <div class="numgrid" data-mystery="286">
+      <div class="numcard" data-n="285">285</div>
+      <div class="numcard" data-n="386">386</div>
+      <div class="numcard" data-n="286">286</div>
+      <div class="numcard" data-n="289">289</div>
+    </div>
+    <div class="tool-msg" id="m2">🎉 Brilliant detective work! The locker number is 286.</div>
+
+    <h3>Quick Check</h3>
+    <div class="q"><span class="qnum">Q1</span><span class="qtxt">A number has 6 hundreds, an odd ones digit, and is less than 610. It could be:</span>
+      <div class="opts" data-correct="1">
+        <button class="opt" data-i="0">628</button>
+        <button class="opt" data-i="1">607</button>
+        <button class="opt" data-i="2">650</button>
+        <button class="opt" data-i="3">616</button>
+      </div><div class="fb"></div></div>
+
+    <div class="nav-row"><button class="btn" data-go="s0">← Back</button><button class="btn next" data-go="s2">Next case 🧩 →</button></div>
+  </section>
+
+  <!-- S2 PATTERN PATROL -->
+  <section class="card" id="s2">
+    <h2><span>🧩</span>Pattern Patrol</h2>
+    <div class="lead">Patterns leave a <b>trail</b>. Find the rule — is it adding? subtracting? skip counting? — then predict what comes next. Detectives ALWAYS check the rule works for the WHOLE pattern.</div>
+
+    <h3>🔗 Match each pattern to its RULE</h3>
+    <p style="color:#3D5488;font-weight:700;margin-bottom:6px">Click a pattern on the left, then click its matching rule on the right.</p>
+    <div class="match-wrap" data-match="pat">
+      <div class="match-col">
+        <div class="ml">PATTERN</div>
+        <div class="mitem" data-k="a">5, 10, 15, 20...</div>
+        <div class="mitem" data-k="b">100, 200, 300...</div>
+        <div class="mitem" data-k="c">2, 4, 6, 8...</div>
+        <div class="mitem" data-k="d">90, 80, 70, 60...</div>
+      </div>
+      <div class="match-col">
+        <div class="ml">RULE</div>
+        <div class="mitem" data-k="c">Add 2 each time</div>
+        <div class="mitem" data-k="d">Subtract 10 each time</div>
+        <div class="mitem" data-k="a">Add 5 each time</div>
+        <div class="mitem" data-k="b">Add 100 each time</div>
+      </div>
+    </div>
+    <div class="tool-msg" id="matchMsg">🎉 All patterns solved! You see the rules like a true detective.</div>
+
+    <h3>Predict the Next Clue</h3>
+    <div class="q"><span class="qnum">Q1</span><span class="qtxt">Pattern: 25, 50, 75, 100, ___ . What comes next?</span>
+      <div class="opts" data-correct="2">
+        <button class="opt" data-i="0">110</button>
+        <button class="opt" data-i="1">150</button>
+        <button class="opt" data-i="2">125</button>
+        <button class="opt" data-i="3">200</button>
+      </div><div class="fb"></div></div>
+
+    <div class="q"><span class="qnum">Q2</span><span class="qtxt">Pattern: 470, 460, 450, 440, ___ . What comes next?</span>
+      <div class="opts" data-correct="0">
+        <button class="opt" data-i="0">430</button>
+        <button class="opt" data-i="1">450</button>
+        <button class="opt" data-i="2">441</button>
+        <button class="opt" data-i="3">340</button>
+      </div><div class="fb"></div></div>
+
+    <div class="q"><span class="qnum">Q3</span><span class="qtxt">Tricky! Pattern: 3, 6, 12, 24, ___ . The rule is "double it." What comes next?</span>
+      <div class="opts" data-correct="3">
+        <button class="opt" data-i="0">30</button>
+        <button class="opt" data-i="1">36</button>
+        <button class="opt" data-i="2">27</button>
+        <button class="opt" data-i="3">48</button>
+      </div><div class="fb"></div></div>
+
+    <div class="nav-row"><button class="btn" data-go="s1">← Back</button><button class="btn next" data-go="s3">Next case 📋 →</button></div>
+  </section>
+
+  <!-- S3 THE LINEUP -->
+  <section class="card" id="s3">
+    <h2><span>📋</span>The Lineup — Ordering Numbers</h2>
+    <div class="lead">In a police lineup, suspects stand in order. Your job: order numbers from <b>smallest to largest</b>. Detective trick: compare the <b>hundreds first</b>. If they tie, compare the <b>tens</b>. Still tied? Compare the <b>ones</b>.</div>
+
+    <h3>🚓 Build the Lineup — click numbers from SMALLEST to LARGEST</h3>
+    <div class="sort-pool" id="lineupPool" data-order="234,243,324,342,423">
+      <div class="sort-item" data-v="423">423</div>
+      <div class="sort-item" data-v="234">234</div>
+      <div class="sort-item" data-v="342">342</div>
+      <div class="sort-item" data-v="243">243</div>
+      <div class="sort-item" data-v="324">324</div>
+    </div>
+    <div style="background:#EEF2FA;border-radius:12px;padding:14px;min-height:54px;display:flex;gap:8px;flex-wrap:wrap;align-items:center" id="lineupSlots">
+      <span style="color:#7A88A8;font-weight:700">Your lineup will appear here...</span>
+    </div>
+    <button class="btn ghost" data-reset="lineup" style="margin-top:10px">↺ Start Over</button>
+    <div class="tool-msg" id="lineupMsg">🎉 Perfect lineup! Smallest to largest, exactly right.</div>
+
+    <h3>Detective Quick Check</h3>
+    <div class="q"><span class="qnum">Q1</span><span class="qtxt">Which list is in order from SMALLEST to LARGEST?</span>
+      <div class="opts" data-correct="1">
+        <button class="opt" data-i="0">512, 251, 125</button>
+        <button class="opt" data-i="1">125, 251, 512</button>
+        <button class="opt" data-i="2">251, 125, 512</button>
+        <button class="opt" data-i="3">512, 125, 251</button>
+      </div><div class="fb"></div></div>
+
+    <div class="q"><span class="qnum">Q2</span><span class="qtxt">Put in order LARGEST first: 380, 308, 830. The largest is:</span>
+      <div class="opts" data-correct="2">
+        <button class="opt" data-i="0">380</button>
+        <button class="opt" data-i="1">308</button>
+        <button class="opt" data-i="2">830</button>
+        <button class="opt" data-i="3">They are equal</button>
+      </div><div class="fb"></div></div>
+
+    <div class="nav-row"><button class="btn" data-go="s2">← Back</button><button class="btn next" data-go="s4">Next case 🎯 →</button></div>
+  </section>
+
+  <!-- S4 ROUNDING -->
+  <section class="card" id="s4">
+    <h2><span>🎯</span>Rounding Squad — Estimation</h2>
+    <div class="lead">Detectives don&rsquo;t always need the EXACT number — sometimes a smart guess is enough. <b>Rounding</b> to the nearest ten: look at the ones digit. <b>0-4 rounds DOWN, 5-9 rounds UP.</b></div>
+
+    <div class="case-file">
+      <div class="ct">🔎 Detective Example</div>
+      <div class="clue"><span class="ci">📍</span> Round <b>67</b> to the nearest ten: ones digit is 7 (that&rsquo;s 5 or more) → round UP → <b>70</b></div>
+      <div class="clue"><span class="ci">📍</span> Round <b>43</b> to the nearest ten: ones digit is 3 (less than 5) → round DOWN → <b>40</b></div>
+    </div>
+
+    <h3>Sort the Suspects — does each number round to 50 or 60?</h3>
+    <p style="color:#3D5488;font-weight:700;margin-bottom:6px">Click a number, then click the correct bin.</p>
+    <div class="sort-pool" id="roundPool">
+      <div class="sort-item" data-bin="50">52</div>
+      <div class="sort-item" data-bin="60">58</div>
+      <div class="sort-item" data-bin="50">54</div>
+      <div class="sort-item" data-bin="60">61</div>
+      <div class="sort-item" data-bin="60">57</div>
+      <div class="sort-item" data-bin="50">53</div>
+    </div>
+    <div class="sort-bins">
+      <div class="sbin" data-bin="50"><div class="bl">Rounds to 50</div><div class="holder"></div></div>
+      <div class="sbin" data-bin="60"><div class="bl">Rounds to 60</div><div class="holder"></div></div>
+    </div>
+    <div class="tool-msg" id="roundMsg">🎉 Every suspect sorted! Sharp estimating, Detective.</div>
+
+    <h3>Quick Check</h3>
+    <div class="q"><span class="qnum">Q1</span><span class="qtxt">Round <b>86</b> to the nearest ten:</span>
+      <div class="opts" data-correct="3">
+        <button class="opt" data-i="0">80</button>
+        <button class="opt" data-i="1">100</button>
+        <button class="opt" data-i="2">85</button>
+        <button class="opt" data-i="3">90</button>
+      </div><div class="fb"></div></div>
+
+    <div class="q"><span class="qnum">Q2</span><span class="qtxt">About how much is <b>41 + 38</b>? (Round each to the nearest ten first.)</span>
+      <div class="opts" data-correct="0">
+        <button class="opt" data-i="0">About 80 (40 + 40)</button>
+        <button class="opt" data-i="1">About 100</button>
+        <button class="opt" data-i="2">About 60</button>
+        <button class="opt" data-i="3">About 50</button>
+      </div><div class="fb"></div></div>
+
+    <div class="nav-row"><button class="btn" data-go="s3">← Back</button><button class="btn next" data-go="s5">Final case 🏆 →</button></div>
+  </section>
+
+  <!-- S5 MASTER CASE -->
+  <section class="card" id="s5">
+    <h2><span>🏆</span>The Master Case</h2>
+    <div class="lead">Detective Bristol — this is your toughest case yet. Read carefully, think in steps, and crack it!</div>
+
+    <div class="q"><span class="qnum">Q1</span><span class="qtxt">A number has 7 hundreds. Its tens digit is double its ones digit. The ones digit is 3. What is the number?</span>
+      <div class="opts" data-correct="2">
+        <button class="opt" data-i="0">733</button>
+        <button class="opt" data-i="1">736</button>
+        <button class="opt" data-i="2">763</button>
+        <button class="opt" data-i="3">736</button>
+      </div><div class="fb"></div></div>
+
+    <div class="q"><span class="qnum">Q2</span><span class="qtxt">Pattern: 200, 250, 300, 350, ___, ___ . The next TWO numbers are:</span>
+      <div class="opts" data-correct="1">
+        <button class="opt" data-i="0">360, 370</button>
+        <button class="opt" data-i="1">400, 450</button>
+        <button class="opt" data-i="2">400, 500</button>
+        <button class="opt" data-i="3">351, 352</button>
+      </div><div class="fb"></div></div>
+
+    <div class="q"><span class="qnum">Q3</span><span class="qtxt">Which number is between 540 and 560?</span>
+      <div class="opts" data-correct="3">
+        <button class="opt" data-i="0">538</button>
+        <button class="opt" data-i="1">562</button>
+        <button class="opt" data-i="2">605</button>
+        <button class="opt" data-i="3">551</button>
+      </div><div class="fb"></div></div>
+
+    <div class="q"><span class="qnum">Q4</span><span class="qtxt">The chickens laid about 60 eggs Monday and about 40 eggs Tuesday. ESTIMATE the total:</span>
+      <div class="opts" data-correct="0">
+        <button class="opt" data-i="0">About 100</button>
+        <button class="opt" data-i="1">About 20</button>
+        <button class="opt" data-i="2">About 200</button>
+        <button class="opt" data-i="3">About 80</button>
+      </div><div class="fb"></div></div>
+
+    <div class="brain">
+      <div class="bt">🧠 BRAIN BUSTER — Senior Detective Only!</div>
+      <div class="q" style="margin:0"><span class="qnum">B1</span><span class="qtxt" style="color:#1B2C5C">I am a 3-digit number. My digits are 2, 5, and 8. I am the LARGEST number you can make with these three digits. Who am I?</span>
+        <div class="opts" data-correct="2">
+          <button class="opt" data-i="0">258</button>
+          <button class="opt" data-i="1">528</button>
+          <button class="opt" data-i="2">852</button>
+          <button class="opt" data-i="3">825</button>
+        </div><div class="fb"></div></div>
+    </div>
+
+    <div class="brain">
+      <div class="bt">🧠 BRAIN BUSTER — The Final Mystery</div>
+      <div class="q" style="margin:0"><span class="qnum">B2</span><span class="qtxt" style="color:#1B2C5C">A secret number rounds to 90 (nearest ten). It is an ODD number. Its ones digit is more than 6. What is it?</span>
+        <div class="opts" data-correct="1">
+          <button class="opt" data-i="0">92</button>
+          <button class="opt" data-i="1">87</button>
+          <button class="opt" data-i="2">94</button>
+          <button class="opt" data-i="3">86</button>
+        </div><div class="fb"></div></div>
+    </div>
+
+    <div class="victory" id="vic">
+      <h2>🔍 CASE SOLVED! 🔍</h2>
+      <div class="crown">🏅 🕵 🏅</div>
+      <p style="font-size:20px;font-weight:800;color:#1B2C5C;font-family:'Fredoka One'">DETECTIVE SCORE: <span id="finalScore">0</span> / 8</p>
+      <div class="quote">
+        "It always seems impossible until it&rsquo;s done."
+        <span class="who">— Nelson Mandela</span>
+      </div>
+      <p style="margin-top:10px;font-size:15px;color:#2A3A5A">Detective Bristol, you cracked every case. Your badge says: NUMBER DETECTIVE, FIRST CLASS! 🏅</p>
+    </div>
+
+    <div class="nav-row"><button class="btn" data-go="s4">← Back</button><span></span></div>
+  </section>
+</main>
+
+<footer class="kce">
+  <div class="gradelvl">GRADE 2 • MATH • NUMBER DETECTIVE AGENCY (WEEK 2b)</div>
+  <div>KINGCRETOT EXPERIENCE © 2026</div>
+  <div class="contact">914.809.0112 • KCE@KINGCRETOT.COM</div>
+</footer>
+<div id="confetti"></div>
+
+<script>
+(function(){
+  'use strict';
+  const state={xp:0,coin:0,lvl:1,done:new Set(),score:0};
+  let ac=null;
+  function ctx(){if(!ac){try{ac=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}}return ac;}
+  function tone(f,d,t,g){const c=ctx();if(!c)return;const o=c.createOscillator(),gn=c.createGain();o.type=t||'sine';o.frequency.value=f;gn.gain.setValueAtTime(0,c.currentTime);gn.gain.linearRampToValueAtTime(g||0.16,c.currentTime+0.01);gn.gain.exponentialRampToValueAtTime(0.0001,c.currentTime+(d||0.18));o.connect(gn);gn.connect(c.destination);o.start();o.stop(c.currentTime+(d||0.18));}
+  function sndOk(){tone(523,0.1,'sine',0.14);setTimeout(function(){tone(659,0.12,'sine',0.14);},90);setTimeout(function(){tone(784,0.16,'sine',0.14);},180);}
+  function sndNo(){tone(220,0.16,'triangle',0.12);setTimeout(function(){tone(180,0.2,'triangle',0.12);},140);}
+  function sndLvl(){[523,659,784,1047,1319].forEach(function(f,i){setTimeout(function(){tone(f,0.15,'sine',0.16);},i*80);});}
+  function hud(){document.getElementById('hudXp').textContent=state.xp;document.getElementById('hudCoin').textContent=state.coin;document.getElementById('hudLvl').textContent=state.lvl;const n=state.lvl*100,c=state.xp%n;document.getElementById('hudBar').style.width=Math.min(100,(c/n)*100)+'%';}
+  function addXp(n){state.xp+=n;state.coin+=Math.floor(n/5);if(state.xp>=state.lvl*100){state.lvl++;sndLvl();state.xp=0;}hud();}
+  function confetti(n){n=n||40;const b=document.getElementById('confetti'),cs=['#E0AC3C','#FFE6A8','#5FB3B3','#3D5488','#1B2C5C'];for(let i=0;i<n;i++){const p=document.createElement('div');p.className='confetti-piece';p.style.left=Math.random()*100+'%';p.style.top='-20px';p.style.background=cs[Math.floor(Math.random()*cs.length)];p.style.transform='rotate('+Math.random()*360+'deg)';p.style.animation='fall '+(1.6+Math.random()*1.6)+'s ease-in forwards';p.style.borderRadius=Math.random()>0.5?'50%':'1px';b.appendChild(p);setTimeout(function(){p.remove();},3400);}}
+  const tabs=document.querySelectorAll('.tab'),cards=document.querySelectorAll('.card'),dots=document.querySelectorAll('.dot');
+  function goto(id){cards.forEach(function(c){c.classList.remove('active');});const el=document.getElementById(id);if(el)el.classList.add('active');tabs.forEach(function(t){t.classList.remove('active');});const tb=document.querySelector('.tab[data-go="'+id+'"]');if(tb)tb.classList.add('active');const idx=Array.prototype.indexOf.call(tabs,tb);dots.forEach(function(d,j){d.classList.remove('cur','done');if(j<idx)d.classList.add('done');if(j===idx)d.classList.add('cur');});window.scrollTo({top:0,behavior:'smooth'});}
+  function markDone(id){if(state.done.has(id))return;state.done.add(id);const tb=document.querySelector('.tab[data-go="'+id+'"]');if(tb)tb.classList.add('done');}
+  function praise(){const a=['Sharp eyes!','Case cracked!','Detective genius!','Brilliant deduction!','You spotted it!','Mystery solved!','Top detective!'];return a[Math.floor(Math.random()*a.length)];}
+
+  // matching state
+  const matchState={};
+  // sorting/lineup state
+  let selItem=null;
+  const lineup=[];
+
+  document.addEventListener('click',function(e){
+    const go=e.target.closest('[data-go]');if(go){goto(go.getAttribute('data-go'));return;}
+
+    // MYSTERY NUMBER cards
+    const nc=e.target.closest('.numcard');
+    if(nc&&!nc.classList.contains('correct')&&!nc.classList.contains('eliminated')){
+      const grid=nc.closest('[data-mystery]');const ans=grid.getAttribute('data-mystery');
+      if(nc.getAttribute('data-n')===ans){nc.classList.add('correct');sndOk();confetti(24);addXp(16);
+        const msg=grid.nextElementSibling;if(msg&&msg.classList.contains('tool-msg'))msg.classList.add('win');
+        grid.querySelectorAll('.numcard').forEach(function(x){if(x!==nc)x.classList.add('eliminated');});
+      }else{nc.classList.add('wrong');sndNo();addXp(2);setTimeout(function(){nc.classList.remove('wrong');nc.classList.add('eliminated');},500);}
+      return;
+    }
+
+    // MATCHING
+    const mi=e.target.closest('.mitem');
+    if(mi&&!mi.classList.contains('matched')){
+      const wrap=mi.closest('[data-match]');const key=wrap.getAttribute('data-match');
+      if(!matchState[key])matchState[key]={sel:null};
+      const st=matchState[key];
+      if(!st.sel){st.sel=mi;mi.classList.add('sel');}
+      else if(st.sel===mi){mi.classList.remove('sel');st.sel=null;}
+      else{
+        if(st.sel.getAttribute('data-k')===mi.getAttribute('data-k')&&st.sel.parentElement!==mi.parentElement){
+          st.sel.classList.remove('sel');st.sel.classList.add('matched');mi.classList.add('matched');st.sel=null;
+          sndOk();confetti(14);addXp(12);
+          const all=wrap.querySelectorAll('.mitem'),done=wrap.querySelectorAll('.mitem.matched');
+          if(all.length===done.length){const msg=document.getElementById('matchMsg');if(msg)msg.classList.add('win');}
+        }else{const bad=st.sel;bad.classList.add('wrong');mi.classList.add('wrong');sndNo();
+          setTimeout(function(){bad.classList.remove('wrong','sel');mi.classList.remove('wrong');},450);st.sel=null;}
+      }
+      return;
+    }
+
+    // LINEUP ordering
+    const li=e.target.closest('#lineupPool .sort-item');
+    if(li&&!li.classList.contains('used')){
+      li.classList.add('used');li.style.display='none';
+      lineup.push(li.getAttribute('data-v'));
+      renderLineup();
+      const target=document.getElementById('lineupPool').getAttribute('data-order').split(',');
+      if(lineup.length===target.length){
+        const ok=lineup.every(function(v,i){return v===target[i];});
+        const msg=document.getElementById('lineupMsg');
+        if(ok){msg.classList.add('win');sndOk();confetti(30);addXp(20);}
+        else{msg.textContent='Not quite in order — click Start Over and compare hundreds first!';msg.style.display='block';msg.style.background='#FFE0E0';msg.style.color='#A02828';sndNo();}
+      }
+      return;
+    }
+
+    // RESET lineup
+    const rs=e.target.closest('[data-reset="lineup"]');
+    if(rs){lineup.length=0;document.querySelectorAll('#lineupPool .sort-item').forEach(function(x){x.classList.remove('used');x.style.display='';});renderLineup();const msg=document.getElementById('lineupMsg');msg.classList.remove('win');msg.style.display='none';msg.textContent='🎉 Perfect lineup! Smallest to largest, exactly right.';msg.style.background='';msg.style.color='';return;}
+
+    // SORTING into bins (rounding)
+    const si=e.target.closest('#roundPool .sort-item');
+    if(si&&!si.classList.contains('used')){
+      if(selItem===si){si.classList.remove('sel');selItem=null;}
+      else{if(selItem)selItem.classList.remove('sel');selItem=si;si.classList.add('sel');}
+      return;
+    }
+    const bin=e.target.closest('.sbin');
+    if(bin&&selItem){
+      const want=selItem.getAttribute('data-bin'),got=bin.getAttribute('data-bin');
+      const holder=bin.querySelector('.holder');const chip=document.createElement('span');
+      chip.className='chip';chip.textContent=selItem.textContent;
+      if(want===got){selItem.classList.add('used');selItem.style.display='none';holder.appendChild(chip);sndOk();confetti(12);addXp(10);
+        const left=document.querySelectorAll('#roundPool .sort-item:not(.used)');
+        if(left.length===0){document.getElementById('roundMsg').classList.add('win');}
+      }else{chip.classList.add('bad');holder.appendChild(chip);sndNo();
+        setTimeout(function(){chip.remove();},700);}
+      selItem.classList.remove('sel');selItem=null;
+      return;
+    }
+
+    // MC questions
+    const opt=e.target.closest('.opt');
+    if(opt&&!opt.disabled){
+      const w=opt.parentElement,corr=parseInt(w.getAttribute('data-correct'),10),chosen=parseInt(opt.getAttribute('data-i'),10),fb=w.parentElement.querySelector('.fb'),all=w.querySelectorAll('.opt');
+      all.forEach(function(o){o.disabled=true;});
+      if(chosen===corr){opt.classList.add('correct');fb.className='fb ok';fb.textContent='✓ '+praise();sndOk();confetti(20);addXp(14);}
+      else{opt.classList.add('wrong');all[corr].classList.add('correct');fb.className='fb no';fb.textContent='Re-examine the clues! The answer is '+all[corr].textContent.trim()+'.';sndNo();addXp(3);}
+      const c=opt.closest('.card');
+      if(c&&c.id==='s5'){state.score=document.querySelectorAll('#s5 .opt.correct').length;}
+      checkSec(c);
+      return;
+    }
+  });
+
+  function renderLineup(){
+    const slots=document.getElementById('lineupSlots');
+    if(lineup.length===0){slots.innerHTML='<span style="color:#7A88A8;font-weight:700">Your lineup will appear here...</span>';return;}
+    slots.innerHTML='';
+    lineup.forEach(function(v,i){
+      const s=document.createElement('span');s.className='chip';
+      s.style.cssText='background:#3D5488;color:#fff;border-radius:8px;padding:8px 14px;font-family:Fredoka One,cursive;font-size:18px';
+      s.textContent=(i+1)+'. '+v;slots.appendChild(s);
+    });
+  }
+  function checkSec(c){if(!c)return;const ops=c.querySelectorAll('.opts');let ans=0;ops.forEach(function(o){if(o.querySelector('.opt[disabled]'))ans++;});if(c.id==='s5'){if(ans>=8)showVic();}else if(ans>=ops.length&&ops.length>0)markDone(c.id);}
+  function showVic(){markDone('s5');document.getElementById('finalScore').textContent=state.score;const v=document.getElementById('vic');v.classList.add('show');sndLvl();confetti(120);setTimeout(function(){confetti(80);},600);v.scrollIntoView({behavior:'smooth',block:'center'});}
+  hud();
+})();
+</script>
+</body></html>

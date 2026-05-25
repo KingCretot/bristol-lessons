@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎉 Bristol's End-of-Year Barnyard Festival | KingCretot Experience</title>
+<style>
+  :root{
+    --navy:#1B2C5C; --gold:#E0AC3C; --sky:#7CC6FF; --grass:#86D464;
+    --pink:#FFB7D5; --pumpkin:#FF9447; --cream:#FFF8E8; --ink:#1f2937;
+    --ok:#2e9d4a; --bad:#dc2626; --shadow:0 4px 14px rgba(27,44,92,.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{font-family:'Nunito','Comic Sans MS',sans-serif;background:linear-gradient(135deg,#FFF8E8 0%,#FFE9D6 50%,#E0F6FF 100%);color:var(--ink);min-height:100vh;font-size:18px;line-height:1.55}
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Bangers&family=Fredoka+One&display=swap');
+
+  /* ===== HUD ===== */
+  .hud{position:fixed;top:0;left:0;right:0;background:linear-gradient(135deg,var(--navy),#0f1a3a);color:#fff;padding:10px 20px;display:flex;justify-content:space-between;align-items:center;z-index:100;box-shadow:var(--shadow);flex-wrap:wrap;gap:8px}
+  .hud-left{display:flex;align-items:center;gap:12px;font-family:'Fredoka One',cursive;font-size:1.2rem}
+  .hud-right{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  .stat{background:rgba(255,255,255,.13);padding:6px 14px;border-radius:20px;font-weight:800;font-size:.95rem;display:flex;align-items:center;gap:6px}
+  .stat .ico{font-size:1.2rem}
+  .xpbar{width:130px;height:10px;background:rgba(255,255,255,.2);border-radius:5px;overflow:hidden}
+  .xpfill{height:100%;background:linear-gradient(90deg,var(--gold),#FFD86F);transition:width .4s;width:0%}
+
+  /* ===== Layout ===== */
+  .wrap{max-width:880px;margin:80px auto 30px;padding:14px}
+  .slide{background:#fff;border-radius:24px;padding:28px;box-shadow:var(--shadow);min-height:520px;display:none;animation:pop .35s ease}
+  .slide.active{display:block}
+  @keyframes pop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+
+  h1{font-family:'Bangers',cursive;font-size:2.4rem;color:var(--navy);letter-spacing:1.5px;margin-bottom:6px}
+  h2{font-family:'Fredoka One',cursive;font-size:1.75rem;color:var(--navy);margin-bottom:12px}
+  h3{font-family:'Fredoka One',cursive;font-size:1.25rem;color:var(--pumpkin);margin:14px 0 8px}
+  p{margin-bottom:10px;font-size:1.05rem}
+
+  .badge{display:inline-block;padding:5px 14px;border-radius:14px;font-weight:900;font-size:.78rem;letter-spacing:1px;text-transform:uppercase;background:linear-gradient(135deg,var(--gold),#F2C465);color:var(--navy);margin-bottom:8px}
+
+  /* ===== Buttons ===== */
+  .btn{padding:13px 26px;border-radius:14px;font-weight:900;border:none;cursor:pointer;font-family:inherit;font-size:1rem;transition:all .15s;display:inline-flex;align-items:center;gap:8px}
+  .btn-go{background:linear-gradient(135deg,var(--grass),#5DB041);color:#fff;box-shadow:0 4px 0 #3D8A30}
+  .btn-go:hover{transform:translateY(-2px);box-shadow:0 6px 0 #3D8A30}
+  .btn-go:active{transform:translateY(2px);box-shadow:0 2px 0 #3D8A30}
+  .btn-back{background:#e5e7eb;color:#374151}
+  .btn-pri{background:linear-gradient(135deg,var(--navy),#314580);color:#fff;box-shadow:0 4px 0 #0f1a3a}
+  .btn-pri:hover{transform:translateY(-2px)}
+
+  /* ===== Nav ===== */
+  .nav{display:flex;justify-content:space-between;align-items:center;margin-top:24px;gap:10px;flex-wrap:wrap}
+  .dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+  .dot{width:11px;height:11px;border-radius:50%;background:#cbd5e1;transition:all .2s}
+  .dot.on{background:var(--gold);transform:scale(1.4)}
+  .dot.done{background:var(--grass)}
+
+  /* ===== Mascots & decoration ===== */
+  .mascot-row{display:flex;justify-content:center;gap:14px;font-size:3.2rem;margin:10px 0 18px;flex-wrap:wrap}
+  .mascot{display:inline-block;animation:bob 2.6s ease-in-out infinite}
+  .mascot:nth-child(2){animation-delay:.3s}
+  .mascot:nth-child(3){animation-delay:.6s}
+  .mascot:nth-child(4){animation-delay:.9s}
+  .mascot:nth-child(5){animation-delay:1.2s}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-12px) rotate(3deg)}}
+
+  /* ===== Cards ===== */
+  .card{background:#fffaf0;border:3px solid #FFE9C7;border-radius:18px;padding:16px;margin:12px 0}
+  .card-pink{background:#FFF0F6;border-color:#FFD3E2}
+  .card-sky{background:#EAF6FF;border-color:#C9E5FB}
+  .card-grass{background:#EFFAE6;border-color:#C9EAB4}
+  .card-gold{background:#FFF6E1;border-color:#FFE0A0}
+
+  /* ===== Quiz layout ===== */
+  .qbox{background:#fff;border:3px solid #E2E8F0;border-radius:18px;padding:18px;margin:14px 0;transition:border-color .25s}
+  .qbox.ok{border-color:var(--ok);background:#F0FBF3}
+  .qbox.bad{border-color:var(--bad);background:#FEF2F2}
+  .qprompt{font-weight:800;font-size:1.05rem;margin-bottom:12px;color:var(--navy)}
+  .opts{display:grid;grid-template-columns:1fr;gap:8px}
+  @media(min-width:600px){.opts{grid-template-columns:1fr 1fr}}
+  .opt{background:#fff;border:3px solid #cbd5e1;border-radius:12px;padding:12px 14px;font-weight:700;cursor:pointer;text-align:left;font-family:inherit;font-size:1rem;transition:all .15s}
+  .opt:hover{border-color:var(--gold);background:#FFF8E8;transform:translateY(-2px)}
+  .opt.right{background:#D9F7E1;border-color:var(--ok);color:#065f46}
+  .opt.wrong{background:#FFE2E2;border-color:var(--bad);color:#991b1b}
+  .opt:disabled{cursor:not-allowed}
+  .feedback{margin-top:10px;padding:12px;border-radius:10px;font-weight:700;font-size:.96rem;display:none}
+  .feedback.show{display:block}
+  .feedback.ok{background:#D9F7E1;color:#065f46}
+  .feedback.bad{background:#FFE2E2;color:#991b1b}
+
+  /* ===== Fill in inputs ===== */
+  .fillrow{display:flex;align-items:center;gap:10px;margin:10px 0;flex-wrap:wrap;background:#fffaf0;padding:10px 14px;border-radius:12px;border:2px dashed #FFC97A}
+  .fillrow input{font-family:inherit;font-size:1.05rem;font-weight:800;padding:8px 12px;border:2px solid #cbd5e1;border-radius:9px;width:90px;text-align:center;background:#fff}
+  .fillrow input.ok{border-color:var(--ok);background:#D9F7E1}
+  .fillrow input.bad{border-color:var(--bad);background:#FFE2E2}
+  .checkbtn{padding:9px 18px;border-radius:10px;border:none;background:var(--pumpkin);color:#fff;font-weight:900;cursor:pointer;font-family:inherit}
+  .checkbtn:hover{background:#E07A2F}
+
+  /* ===== Visual elements ===== */
+  .standalg{display:grid;grid-template-columns:auto auto;gap:0 14px;font-family:'Fredoka One',cursive;font-size:1.6rem;justify-content:center;background:#FFFEF5;border:3px solid #FFE9C7;border-radius:14px;padding:18px;margin:10px auto;width:fit-content;color:var(--navy)}
+  .standalg .op{grid-column:1;text-align:right;color:var(--pumpkin)}
+  .standalg .num{grid-column:2;text-align:right;letter-spacing:6px}
+  .standalg .line{grid-column:1/3;border-bottom:3px solid var(--navy);margin-top:4px}
+  .carry{font-size:.9rem;color:var(--bad);font-weight:900}
+
+  .clock-svg{display:block;margin:10px auto}
+  .coin-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:14px 0}
+  .coin{font-size:2.4rem;display:inline-block;animation:spin 4s linear infinite}
+  @keyframes spin{0%,100%{transform:rotateY(0)}50%{transform:rotateY(180deg)}}
+
+  /* ===== Confetti ===== */
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:200;display:none}
+  .conf-piece{position:absolute;width:10px;height:10px;animation:fall 1.6s linear forwards}
+  @keyframes fall{to{transform:translateY(100vh) rotate(720deg);opacity:0}}
+
+  /* ===== Wrong-X overlay ===== */
+  #xover{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:150;pointer-events:none}
+  #xover.show{display:flex;animation:xpop .55s ease-out}
+  #xover .x{font-size:9rem;color:var(--bad);font-weight:900;text-shadow:0 0 24px rgba(220,38,38,.5)}
+  @keyframes xpop{0%{transform:scale(.3);opacity:0}40%{transform:scale(1.3);opacity:1}100%{transform:scale(1);opacity:0}}
+
+  .quote{font-style:italic;text-align:center;font-size:1.15rem;color:var(--navy);background:linear-gradient(135deg,#FFF6E1,#FFE9C7);padding:18px;border-radius:16px;border-left:6px solid var(--gold);margin:20px 0}
+
+  .review-grid{display:grid;grid-template-columns:1fr;gap:10px;margin:14px 0}
+  @media(min-width:600px){.review-grid{grid-template-columns:1fr 1fr}}
+  .review-card{background:linear-gradient(135deg,#FFF6E1,#fffaf0);border:3px solid #FFE0A0;border-radius:14px;padding:14px;font-weight:700}
+  .review-card strong{color:var(--pumpkin);display:block;margin-bottom:4px}
+
+  .footer-tag{text-align:center;color:#64748b;font-size:.82rem;margin-top:14px;font-weight:700}
+</style>
+</head>
+<body>
+
+<!-- ===== HUD ===== -->
+<div class="hud">
+  <div class="hud-left">🎉 Bristol's Barnyard Festival</div>
+  <div class="hud-right">
+    <div class="stat"><span class="ico">⭐</span><span id="xpVal">0</span> XP</div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="stat"><span class="ico">🪙</span><span id="coinVal">0</span></div>
+    <div class="stat"><span class="ico">🏆</span> Lvl <span id="lvlVal">1</span></div>
+  </div>
+</div>
+
+<div class="wrap">
+<!-- ===== Slide 0: Welcome ===== -->
+<div class="slide active" id="s0">
+  <span class="badge">🎊 End of Year · Celebration!</span>
+  <h1>🎉 You Did It, Bristol!</h1>
+  <div class="mascot-row">🐔 🐄 🐖 🐎 🐑</div>
+  <div class="card card-gold">
+    <p style="font-size:1.1rem"><strong>What a year, superstar!</strong> Today is a celebration of EVERYTHING you learned — and we are going to use it the way real farmers, bakers, and writers do every single day. Reading, math, money, and writing all rolled into one big barnyard festival. Let's have some fun! 🌟</p>
+  </div>
+  <h3>🎯 What you'll learn today:</h3>
+  <div class="review-grid">
+    <div class="review-card"><strong>💰 Real-Life Math</strong>Money, fractions, and counting</div>
+    <div class="review-card"><strong>✍️ Real-Life Writing</strong>Notes, sentences, and word skills</div>
+    <div class="review-card"><strong>📖 Reading Power</strong>Stories, synonyms, and word parts</div>
+    <div class="review-card"><strong>🎮 Festival Fun</strong>Earn XP, coins, and level up!</div>
+  </div>
+  <div class="card card-pink">
+    <p>🎮 <strong>How to win XP:</strong> Get answers right to earn ⭐ XP and 🪙 coins. Tap an answer to lock it in!</p>
+  </div>
+  <div class="nav">
+    <span></span>
+    <button class="btn btn-go" onclick="go(1)">Let's Begin! 🚀</button>
+  </div>
+</div>
+<!-- ===== Slide 1: Review ===== -->
+<div class="slide" id="s1">
+  <span class="badge">🔁 Quick Review</span>
+  <h2>Warm-Up: A Year of Learning</h2>
+  <p>Let's stretch our brains with a quick mix from the whole year! 🧠✨</p>
+
+  <div class="qbox" data-q="r1">
+    <div class="qprompt">🐔 Quick! 8 + 5 = ?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">12</button>
+      <button class="opt" data-i="1" data-c="0">14</button>
+      <button class="opt" data-i="2" data-c="0">11</button>
+      <button class="opt" data-i="3" data-c="1">13</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="r2">
+    <div class="qprompt">📖 Which word is a NOUN (a person, place, or thing)?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="1">barn</button>
+      <button class="opt" data-i="1" data-c="0">run</button>
+      <button class="opt" data-i="2" data-c="0">happy</button>
+      <button class="opt" data-i="3" data-c="0">quickly</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="r3">
+    <div class="qprompt">✖️ 5 × 2 = ?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">7</button>
+      <button class="opt" data-i="1" data-c="0">12</button>
+      <button class="opt" data-i="2" data-c="1">10</button>
+      <button class="opt" data-i="3" data-c="0">8</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="r4">
+    <div class="qprompt">🔤 What is the OPPOSITE of "hot"?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">warm</button>
+      <button class="opt" data-i="1" data-c="1">cold</button>
+      <button class="opt" data-i="2" data-c="0">fast</button>
+      <button class="opt" data-i="3" data-c="0">big</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="nav">
+    <button class="btn btn-back" onclick="go(0)">← Back</button>
+    <div class="dots" id="dots"></div>
+    <button class="btn btn-go" onclick="go(2)">Next: The Farm Stand! 💰</button>
+  </div>
+</div>
+<!-- ===== Slide 2: At the Farm Stand ===== -->
+<div class="slide" id="s2">
+  <span class="badge">💰 Real Life</span>
+  <h2>At the Farm Stand</h2>
+  <p>Today you are running the farm stand! Real shopkeepers count <strong>money</strong> and make <strong>change</strong> all day long. Let's practice the way you really would. 💵</p>
+  <div class="card card-gold">
+    <h3>🪙 Coins You Know</h3>
+    <div class="review-grid">
+      <div class="review-card"><strong>Penny</strong>1 cent</div>
+      <div class="review-card"><strong>Nickel</strong>5 cents</div>
+      <div class="review-card"><strong>Dime</strong>10 cents</div>
+      <div class="review-card"><strong>Quarter</strong>25 cents</div>
+    </div>
+  </div>
+  <div class="card card-sky">
+    <h3>🥚 At the Stand</h3>
+    <p>A customer buys eggs for <strong>30¢</strong> and hands you <strong>2 quarters</strong>. Two quarters make 50¢, so the change is 50 − 30.</p>
+    <div class="fillrow">
+      <span>A quarter is worth </span>
+      <input type="text" id="m1" maxlength="6"><span> cents</span>
+      <button class="checkbtn" onclick="checkFill('m1','25','m1fb')">Check</button>
+      <span id="m1fb" style="font-weight:800"></span>
+    </div>
+  </div>
+
+  <div class="qbox" data-q="s1a">
+    <div class="qprompt">💵 Eggs cost 30¢. You pay with 2 quarters (50¢). How much CHANGE do you get?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="1">20¢</button>
+      <button class="opt" data-i="1" data-c="0">30¢</button>
+      <button class="opt" data-i="2" data-c="0">10¢</button>
+      <button class="opt" data-i="3" data-c="0">25¢</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="s1b">
+    <div class="qprompt">🪙 How much money is 3 dimes and 1 nickel?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="1">35¢</button>
+      <button class="opt" data-i="1" data-c="0">30¢</button>
+      <button class="opt" data-i="2" data-c="0">40¢</button>
+      <button class="opt" data-i="3" data-c="0">31¢</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="s1c">
+    <div class="qprompt">📖 The stand sign reads: "Fresh eggs for sale." Which word tells WHAT is for sale?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">fresh</button>
+      <button class="opt" data-i="1" data-c="0">for</button>
+      <button class="opt" data-i="2" data-c="0">sale</button>
+      <button class="opt" data-i="3" data-c="1">eggs</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="nav">
+    <button class="btn btn-back" onclick="go(1)">← Back</button>
+    <div class="dots"></div>
+    <button class="btn btn-go" onclick="go(3)">Next: Baking Day! 🥧</button>
+  </div>
+</div>
+<!-- ===== Slide 3: Baking Day with Grandma ===== -->
+<div class="slide" id="s3">
+  <span class="badge">🥧 Real Life</span>
+  <h2>Baking Day with Grandma</h2>
+  <p>Baking uses <strong>fractions</strong> (equal parts) AND <strong>sequence words</strong> (first, next, then, last). Real recipes need both! 👩‍🍳</p>
+  <div class="card card-pink">
+    <h3>🥧 Equal Parts</h3>
+    <p>When we cut food into <strong>equal</strong> parts, each part is a fraction. A pie cut into 4 equal parts — each slice is <strong>1/4</strong>.</p>
+  </div>
+  <div class="card card-grass">
+    <h3>📋 Recipe Order</h3>
+    <p>A recipe always has an order: <strong>First</strong> mix, <strong>next</strong> pour, <strong>then</strong> bake, <strong>last</strong> cool.</p>
+    <div class="fillrow">
+      <span>One of 4 equal parts is 1/</span>
+      <input type="text" id="m2" maxlength="6">
+      <button class="checkbtn" onclick="checkFill('m2','4','m2fb')">Check</button>
+      <span id="m2fb" style="font-weight:800"></span>
+    </div>
+  </div>
+
+  <div class="qbox" data-q="s2a">
+    <div class="qprompt">🍕 A pizza is cut into 2 equal parts. One part is —</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="1">1/2</button>
+      <button class="opt" data-i="1" data-c="0">1/4</button>
+      <button class="opt" data-i="2" data-c="0">2</button>
+      <button class="opt" data-i="3" data-c="0">1/3</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="s2b">
+    <div class="qprompt">📋 Which word tells what to do FIRST in a recipe?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">last</button>
+      <button class="opt" data-i="1" data-c="1">first</button>
+      <button class="opt" data-i="2" data-c="0">then</button>
+      <button class="opt" data-i="3" data-c="0">after</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="s2c">
+    <div class="qprompt">🥧 A pie is cut into 3 equal pieces. One piece is —</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">1/2</button>
+      <button class="opt" data-i="1" data-c="1">1/3</button>
+      <button class="opt" data-i="2" data-c="0">3</button>
+      <button class="opt" data-i="3" data-c="0">1/4</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="nav">
+    <button class="btn btn-back" onclick="go(2)">← Back</button>
+    <div class="dots"></div>
+    <button class="btn btn-go" onclick="go(4)">Next: Write a Letter! ✍️</button>
+  </div>
+</div>
+<!-- ===== Slide 4: Writing a Letter to a Friend ===== -->
+<div class="slide" id="s4">
+  <span class="badge">✍️ Real Life</span>
+  <h2>Writing a Letter to a Friend</h2>
+  <p>When you write a real letter, you use <strong>capital letters</strong>, <strong>end marks</strong>, and the right <strong>words</strong>. Let's write like a pro! 💌</p>
+  <div class="card card-gold">
+    <h3>✏️ Sentence Rules</h3>
+    <div class="review-grid">
+      <div class="review-card"><strong>Start</strong>Begin with a capital letter</div>
+      <div class="review-card"><strong>End</strong>Telling sentence ends with a period</div>
+      <div class="review-card"><strong>Names</strong>People and places get capitals</div>
+      <div class="review-card"><strong>Action</strong>Verbs are doing words</div>
+    </div>
+  </div>
+  <div class="card card-sky">
+    <h3>💌 Try it!</h3>
+    <p>The mark at the end of a telling sentence is called a — (type the word)</p>
+    <div class="fillrow">
+      <span>It is a </span>
+      <input type="text" id="m3" maxlength="6">
+      <button class="checkbtn" onclick="checkFill('m3','period','m3fb')">Check</button>
+      <span id="m3fb" style="font-weight:800"></span>
+    </div>
+  </div>
+
+  <div class="qbox" data-q="s3a">
+    <div class="qprompt">✏️ Which sentence is written CORRECTLY?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">my dog ran fast.</button>
+      <button class="opt" data-i="1" data-c="0">My dog ran fast</button>
+      <button class="opt" data-i="2" data-c="0">my dog ran fast</button>
+      <button class="opt" data-i="3" data-c="1">My dog ran fast.</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="s3b">
+    <div class="qprompt">🔤 What is the contraction for "it is"?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">its</button>
+      <button class="opt" data-i="1" data-c="0">it is</button>
+      <button class="opt" data-i="2" data-c="0">itis</button>
+      <button class="opt" data-i="3" data-c="1">it's</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="s3c">
+    <div class="qprompt">🏃 Which word is an ACTION verb?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="1">jump</button>
+      <button class="opt" data-i="1" data-c="0">table</button>
+      <button class="opt" data-i="2" data-c="0">blue</button>
+      <button class="opt" data-i="3" data-c="0">slowly</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="nav">
+    <button class="btn btn-back" onclick="go(3)">← Back</button>
+    <div class="dots"></div>
+    <button class="btn btn-go" onclick="go(5)">Next: Count the Flock! 🐔</button>
+  </div>
+</div>
+<!-- ===== Slide 5: Counting the Whole Flock ===== -->
+<div class="slide" id="s5">
+  <span class="badge">🐔 Real Life</span>
+  <h2>Counting the Whole Flock</h2>
+  <p>Farmers count animals every day! Let's use <strong>place value</strong>, <strong>skip counting</strong>, and <strong>even &amp; odd</strong> numbers. 🔢</p>
+  <div class="card card-pink">
+    <h3>🔢 Place Value</h3>
+    <p>In the number <strong>462</strong>: the <strong>4</strong> is hundreds, the <strong>6</strong> is tens, the <strong>2</strong> is ones.</p>
+  </div>
+  <div class="card card-grass">
+    <h3>🐾 Counting Tricks</h3>
+    <p><strong>Skip count by 5:</strong> 5, 10, 15, 20... &nbsp; <strong>Even</strong> numbers end in 0, 2, 4, 6, 8. <strong>Odd</strong> end in 1, 3, 5, 7, 9.</p>
+    <div class="fillrow">
+      <span>In 462, the tens digit is </span>
+      <input type="text" id="m4" maxlength="6">
+      <button class="checkbtn" onclick="checkFill('m4','6','m4fb')">Check</button>
+      <span id="m4fb" style="font-weight:800"></span>
+    </div>
+  </div>
+
+  <div class="qbox" data-q="s4a">
+    <div class="qprompt">🐾 Skip count by 5: 5, 10, 15, ___ ?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">16</button>
+      <button class="opt" data-i="1" data-c="0">25</button>
+      <button class="opt" data-i="2" data-c="1">20</button>
+      <button class="opt" data-i="3" data-c="0">21</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="s4b">
+    <div class="qprompt">🥚 Is the number 8 EVEN or ODD?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">odd</button>
+      <button class="opt" data-i="1" data-c="0">both</button>
+      <button class="opt" data-i="2" data-c="1">even</button>
+      <button class="opt" data-i="3" data-c="0">neither</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="s4c">
+    <div class="qprompt">✖️ 4 + 4 + 4 is the same as —</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">4 + 3</button>
+      <button class="opt" data-i="1" data-c="1">4 × 3</button>
+      <button class="opt" data-i="2" data-c="0">3 + 3</button>
+      <button class="opt" data-i="3" data-c="0">4 × 4</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="nav">
+    <button class="btn btn-back" onclick="go(4)">← Back</button>
+    <div class="dots"></div>
+    <button class="btn btn-go" onclick="go(6)">Next: Storytime! 📖</button>
+  </div>
+</div>
+<!-- ===== Slide 6: Storytime on the Porch ===== -->
+<div class="slide" id="s6">
+  <span class="badge">📖 Real Life</span>
+  <h2>Storytime on the Porch</h2>
+  <p>Reading is everywhere! Let's use <strong>story parts</strong>, <strong>synonyms</strong>, <strong>compound words</strong>, and <strong>word parts</strong>. 📚</p>
+  <div class="card card-gold">
+    <h3>📚 Read this:</h3>
+    <p><em>Henrietta the hen waddled across the sunny barnyard. She was looking for the best spot to build her nest.</em></p>
+    <p><strong>Character:</strong> Henrietta. &nbsp; <strong>Setting:</strong> the barnyard.</p>
+  </div>
+  <div class="card card-sky">
+    <h3>🧩 Word Builder</h3>
+    <p>Two small words can join into a <strong>compound word</strong>. Try it: sun + set = ? (type the word)</p>
+    <div class="fillrow">
+      <span>sun + set = </span>
+      <input type="text" id="m5" maxlength="6">
+      <button class="checkbtn" onclick="checkFill('m5','sunset','m5fb')">Check</button>
+      <span id="m5fb" style="font-weight:800"></span>
+    </div>
+  </div>
+
+  <div class="qbox" data-q="s5a">
+    <div class="qprompt">🏡 WHERE a story happens is called the —</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">character</button>
+      <button class="opt" data-i="1" data-c="0">title</button>
+      <button class="opt" data-i="2" data-c="1">setting</button>
+      <button class="opt" data-i="3" data-c="0">ending</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="s5b">
+    <div class="qprompt">🔤 Which word is a SYNONYM for "big"?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="1">huge</button>
+      <button class="opt" data-i="1" data-c="0">small</button>
+      <button class="opt" data-i="2" data-c="0">red</button>
+      <button class="opt" data-i="3" data-c="0">slow</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="s5c">
+    <div class="qprompt">🧩 In the word "unhappy," the prefix "un-" means —</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">very</button>
+      <button class="opt" data-i="1" data-c="1">not</button>
+      <button class="opt" data-i="2" data-c="0">again</button>
+      <button class="opt" data-i="3" data-c="0">before</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="nav">
+    <button class="btn btn-back" onclick="go(5)">← Back</button>
+    <div class="dots"></div>
+    <button class="btn btn-go" onclick="go(7)">Final Festival Quiz! 🏆</button>
+  </div>
+</div>
+<!-- ===== Slide 7: Final Quiz ===== -->
+<div class="slide" id="s7">
+  <span class="badge">🏆 Final Challenge</span>
+  <h2>The End-of-Year Festival Quiz!</h2>
+  <p>One last celebration challenge — show off everything you learned this year, Bristol! 🎉🏆</p>
+
+  <div class="qbox" data-q="f1">
+    <div class="qprompt">🐔 7 + 6 = ?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">12</button>
+      <button class="opt" data-i="1" data-c="0">14</button>
+      <button class="opt" data-i="2" data-c="0">11</button>
+      <button class="opt" data-i="3" data-c="1">13</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="f2">
+    <div class="qprompt">📖 Which word is a NOUN?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">happy</button>
+      <button class="opt" data-i="1" data-c="0">run</button>
+      <button class="opt" data-i="2" data-c="1">barn</button>
+      <button class="opt" data-i="3" data-c="0">quickly</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="f3">
+    <div class="qprompt">🥧 A pie in 4 equal parts — one part is —</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="1">1/4</button>
+      <button class="opt" data-i="1" data-c="0">1/2</button>
+      <button class="opt" data-i="2" data-c="0">4</button>
+      <button class="opt" data-i="3" data-c="0">1/3</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="f4">
+    <div class="qprompt">🪙 How much money is 2 quarters?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">25¢</button>
+      <button class="opt" data-i="1" data-c="1">50¢</button>
+      <button class="opt" data-i="2" data-c="0">75¢</button>
+      <button class="opt" data-i="3" data-c="0">40¢</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="f5">
+    <div class="qprompt">🐾 Skip count by 10: 10, 20, 30, ___ ?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">35</button>
+      <button class="opt" data-i="1" data-c="0">50</button>
+      <button class="opt" data-i="2" data-c="1">40</button>
+      <button class="opt" data-i="3" data-c="0">31</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="f6">
+    <div class="qprompt">🔤 What is the OPPOSITE of "up"?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">high</button>
+      <button class="opt" data-i="1" data-c="1">down</button>
+      <button class="opt" data-i="2" data-c="0">over</button>
+      <button class="opt" data-i="3" data-c="0">fast</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="qbox" data-q="f7">
+    <div class="qprompt">✏️ Which sentence is written CORRECTLY?</div>
+    <div class="opts">
+      <button class="opt" data-i="0" data-c="0">the hen is big.</button>
+      <button class="opt" data-i="1" data-c="0">The hen is big</button>
+      <button class="opt" data-i="2" data-c="0">the hen is big</button>
+      <button class="opt" data-i="3" data-c="1">The hen is big.</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+  <div class="nav">
+    <button class="btn btn-back" onclick="go(6)">← Back</button>
+    <div class="dots"></div>
+    <button class="btn btn-go" onclick="go(8)">Finish! 🏆</button>
+  </div>
+</div>
+<!-- ===== Slide 8: Finale ===== -->
+<div class="slide" id="s8">
+  <span class="badge">🌟 You Did It!</span>
+  <h1 style="text-align:center">🎉 Hooray, Bristol — A Whole Year Done! 🎉</h1>
+  <div class="mascot-row">🐔 🐄 🐖 🐎 🐑</div>
+  <div class="card card-gold" style="text-align:center">
+    <h2>Your Festival Score</h2>
+    <p style="font-size:2.4rem;font-family:'Bangers',cursive;color:var(--navy)">⭐ <span id="finalXP">0</span> XP · 🪙 <span id="finalCoins">0</span> coins</p>
+    <p style="font-size:1.2rem;font-weight:800;color:var(--pumpkin)" id="finalLvl">Champion!</p>
+  </div>
+  <div class="quote">
+    "Look how much you have grown this year, Bristol — from your very first lesson to today. Reading, writing, money, and math are tools you will use for the rest of your life. I am so proud of you. Have a wonderful summer!"<br><strong>— Coach Jonathan, KingCretot Experience</strong>
+  </div>
+  <div class="card card-pink" style="text-align:center">
+    <h3>📝 Your Mission Tonight:</h3>
+    <p>Bring your <strong>Festival Companion Packet</strong> to class — and save the <strong>Fun Activities Packet</strong> for your celebration day!</p>
+  </div>
+  <div class="footer-tag">🎉 KingCretot Experience · Bristol's End-of-Year Barnyard Festival 🎉</div>
+</div>
+
+</div><!-- /wrap -->
+
+<!-- ===== Effects ===== -->
+<div id="confetti"></div>
+<div id="xover"><div class="x">✕</div></div>
+<script>
+/* ============ State ============ */
+const state = { xp:0, coins:0, lvl:1, answered:{} };
+const SLIDES = 9;
+const FINALE = 8;
+
+function updateHud(){
+  document.getElementById('xpVal').textContent = state.xp;
+  document.getElementById('coinVal').textContent = state.coins;
+  document.getElementById('lvlVal').textContent = state.lvl;
+  const pct = Math.min(100, (state.xp % 100));
+  document.getElementById('xpFill').style.width = pct + '%';
+  if (state.xp >= state.lvl * 100) state.lvl++;
+}
+function addXP(n){ state.xp += n; updateHud(); }
+function addCoins(n){ state.coins += n; updateHud(); }
+
+/* ============ Navigation ============ */
+function go(i){
+  document.querySelectorAll('.slide').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s'+i).classList.add('active');
+  buildDots(i);
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(i === FINALE) showFinal();
+}
+function buildDots(active){
+  document.querySelectorAll('.dots').forEach(d=>{
+    d.innerHTML = '';
+    for (let k=0; k<SLIDES; k++){
+      const dot = document.createElement('div');
+      dot.className = 'dot' + (k===active?' on':'') + (k<active?' done':'');
+      d.appendChild(dot);
+    }
+  });
+}
+
+/* ============ Sound (Web Audio) ============ */
+let audioCtx;
+function getCtx(){
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+function playRight(){
+  const c = getCtx();
+  [523, 659, 784, 1047].forEach((f,i)=>{
+    const o = c.createOscillator(), g = c.createGain();
+    o.type='sine'; o.frequency.value=f;
+    g.gain.setValueAtTime(0,c.currentTime+i*0.08);
+    g.gain.linearRampToValueAtTime(0.18,c.currentTime+i*0.08+0.02);
+    g.gain.linearRampToValueAtTime(0,c.currentTime+i*0.08+0.18);
+    o.connect(g); g.connect(c.destination);
+    o.start(c.currentTime+i*0.08); o.stop(c.currentTime+i*0.08+0.2);
+  });
+}
+function playWrong(){
+  const c = getCtx();
+  const o = c.createOscillator(), g = c.createGain();
+  o.type='sawtooth'; o.frequency.setValueAtTime(220, c.currentTime);
+  o.frequency.linearRampToValueAtTime(80, c.currentTime+0.4);
+  g.gain.setValueAtTime(0.16, c.currentTime);
+  g.gain.linearRampToValueAtTime(0, c.currentTime+0.4);
+  o.connect(g); g.connect(c.destination);
+  o.start(); o.stop(c.currentTime+0.4);
+}
+
+/* ============ Confetti ============ */
+function confetti(){
+  const root = document.getElementById('confetti');
+  root.style.display = 'block';
+  const colors = ['#E0AC3C','#FF9447','#86D464','#7CC6FF','#FFB7D5','#E85D2C','#0E9F9A','#6F3F8F'];
+  for (let i=0; i<70; i++){
+    const p = document.createElement('div');
+    p.className = 'conf-piece';
+    p.style.left = Math.random()*100 + '%';
+    p.style.top = -10 + 'px';
+    p.style.background = colors[Math.floor(Math.random()*colors.length)];
+    p.style.animationDelay = (Math.random()*0.4) + 's';
+    p.style.animationDuration = (1.2 + Math.random()*1.2) + 's';
+    p.style.borderRadius = (Math.random()>0.5 ? '50%' : '2px');
+    root.appendChild(p);
+  }
+  setTimeout(()=>{ root.innerHTML=''; root.style.display='none'; }, 2400);
+}
+function flashX(){
+  const x = document.getElementById('xover');
+  x.classList.add('show');
+  setTimeout(()=>x.classList.remove('show'), 600);
+}
+
+/* ============ MC Quiz registry (single delegate) ============ */
+document.addEventListener('click', e=>{
+  const opt = e.target.closest('.opt');
+  if (!opt) return;
+  const box = opt.closest('.qbox');
+  if (!box) return;
+  const qid = box.dataset.q;
+  if (state.answered[qid]) return;
+  const correct = opt.dataset.c === '1';
+  const fb = box.querySelector('.feedback');
+  box.querySelectorAll('.opt').forEach(b=>b.disabled=true);
+  if (correct){
+    opt.classList.add('right');
+    box.classList.add('ok');
+    fb.textContent = '🎉 Correct! Great thinking!';
+    fb.className = 'feedback show ok';
+    addXP(10); addCoins(2);
+    playRight(); confetti();
+  } else {
+    opt.classList.add('wrong');
+    box.classList.add('bad');
+    box.querySelectorAll('.opt').forEach(b=>{
+      if (b.dataset.c === '1') b.classList.add('right');
+    });
+    fb.textContent = '❌ Not quite — see the green answer above. Keep going, you have got this!';
+    fb.className = 'feedback show bad';
+    playWrong(); flashX();
+  }
+  state.answered[qid] = true;
+});
+
+/* ============ Fill-in ============ */
+function checkFill(inputId, correct, fbId){
+  const inp = document.getElementById(inputId);
+  const fb = document.getElementById(fbId);
+  if (state.answered['fill-'+inputId]) return;
+  const val = inp.value.trim().toLowerCase();
+  if (val === String(correct).toLowerCase()){
+    inp.classList.add('ok'); inp.disabled = true;
+    fb.textContent = '✅ Yes! ' + correct;
+    fb.style.color = 'var(--ok)';
+    addXP(8); addCoins(2);
+    playRight(); confetti();
+    state.answered['fill-'+inputId] = true;
+  } else {
+    inp.classList.add('bad');
+    fb.textContent = '❌ Try again!';
+    fb.style.color = 'var(--bad)';
+    playWrong(); flashX();
+    setTimeout(()=>{ inp.classList.remove('bad'); fb.textContent=''; }, 1500);
+  }
+}
+
+/* ============ Final ============ */
+function showFinal(){
+  document.getElementById('finalXP').textContent = state.xp;
+  document.getElementById('finalCoins').textContent = state.coins;
+  let title = 'Festival Friend! 🏆';
+  if (state.xp >= 200) title = 'Grade 2 SUPERSTAR! 🌟';
+  else if (state.xp >= 120) title = 'Year-End Champion! ✨';
+  else if (state.xp >= 60) title = 'Barnyard Star! ⭐';
+  document.getElementById('finalLvl').textContent = title;
+  setTimeout(confetti, 300);
+  setTimeout(confetti, 1200);
+}
+
+updateHud();
+buildDots(0);
+</script>
+</body>
+</html>
