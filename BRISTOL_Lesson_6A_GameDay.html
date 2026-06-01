@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐮 Bristol's Barnyard Game Day — Lesson 6A | KingCretot Experience</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Bangers&family=Fredoka+One&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1B2C5C; --gold:#E0AC3C; --berry:#C84B7C; --leaf:#5DA85A;
+    --sky:#7CC6FF; --grass:#86D464; --pink:#FFB7D5; --pumpkin:#FF9447;
+    --cream:#FFF8E8; --ink:#1f2937; --ok:#2e9d4a; --bad:#dc2626;
+    --shadow:0 4px 14px rgba(27,44,92,.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{font-family:'Nunito','Comic Sans MS',sans-serif;background:linear-gradient(135deg,#FFF8E8 0%,#FFE9D6 45%,#E0F6FF 100%);color:var(--ink);min-height:100vh;font-size:18px;line-height:1.55}
+
+  /* ===== HUD ===== */
+  .hud{position:fixed;top:0;left:0;right:0;background:linear-gradient(135deg,var(--navy),#0f1a3a);color:#fff;padding:10px 18px;display:flex;justify-content:space-between;align-items:center;z-index:100;box-shadow:var(--shadow);flex-wrap:wrap;gap:8px}
+  .hud-left{display:flex;align-items:center;gap:10px;font-family:'Fredoka One',cursive;font-size:1.1rem}
+  .hud-right{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .stat{background:rgba(255,255,255,.13);padding:6px 13px;border-radius:20px;font-weight:800;font-size:.92rem;display:flex;align-items:center;gap:6px}
+  .stat .ico{font-size:1.15rem}
+  .xpbar{width:120px;height:10px;background:rgba(255,255,255,.2);border-radius:5px;overflow:hidden}
+  .xpfill{height:100%;background:linear-gradient(90deg,var(--gold),#FFD86F);transition:width .4s;width:0%}
+
+  /* ===== Layout ===== */
+  .wrap{max-width:880px;margin:78px auto 30px;padding:14px}
+  .slide{background:#fff;border-radius:24px;padding:28px;box-shadow:var(--shadow);min-height:520px;display:none;animation:pop .35s ease}
+  .slide.active{display:block}
+  @keyframes pop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+
+  h1{font-family:'Bangers',cursive;font-size:2.5rem;color:var(--navy);letter-spacing:1.5px;margin-bottom:6px;text-align:center}
+  h2{font-family:'Fredoka One',cursive;font-size:1.75rem;color:var(--navy);margin-bottom:6px}
+  h3{font-family:'Fredoka One',cursive;font-size:1.2rem;color:var(--pumpkin);margin:14px 0 8px}
+  p{margin-bottom:10px;font-size:1.05rem}
+
+  .badge{display:inline-block;padding:5px 14px;border-radius:14px;font-weight:900;font-size:.78rem;letter-spacing:1px;text-transform:uppercase;background:linear-gradient(135deg,var(--gold),#F2C465);color:var(--navy);margin-bottom:8px}
+
+  /* ===== Buttons ===== */
+  .btn{padding:13px 26px;border-radius:14px;font-weight:900;border:none;cursor:pointer;font-family:inherit;font-size:1rem;transition:all .15s;display:inline-flex;align-items:center;gap:8px}
+  .btn-go{background:linear-gradient(135deg,var(--grass),#5DB041);color:#fff;box-shadow:0 4px 0 #3D8A30}
+  .btn-go:hover{transform:translateY(-2px)}
+  .btn-go:active{transform:translateY(2px);box-shadow:0 1px 0 #3D8A30}
+  .btn-back{background:#e5e7eb;color:#374151}
+
+  /* ===== Nav ===== */
+  .nav{display:flex;justify-content:space-between;align-items:center;margin-top:24px;gap:10px;flex-wrap:wrap}
+  .dots{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+  .dot{width:11px;height:11px;border-radius:50%;background:#cbd5e1;transition:all .2s}
+  .dot.on{background:var(--gold);transform:scale(1.4)}
+  .dot.done{background:var(--grass)}
+
+  /* ===== Mascots ===== */
+  .mascot-row{display:flex;justify-content:center;gap:14px;font-size:3.2rem;margin:10px 0 18px;flex-wrap:wrap}
+  .mascot{display:inline-block;animation:bob 2.6s ease-in-out infinite}
+  .mascot:nth-child(2){animation-delay:.3s}.mascot:nth-child(3){animation-delay:.6s}
+  .mascot:nth-child(4){animation-delay:.9s}.mascot:nth-child(5){animation-delay:1.2s}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-12px) rotate(3deg)}}
+
+  /* ===== Cards ===== */
+  .card{background:#fffaf0;border:3px solid #FFE9C7;border-radius:18px;padding:16px;margin:12px 0}
+  .card-pink{background:#FFF0F6;border-color:#FFD3E2}
+  .card-sky{background:#EAF6FF;border-color:#C9E5FB}
+  .card-grass{background:#EFFAE6;border-color:#C9EAB4}
+  .card-gold{background:#FFF6E1;border-color:#FFE0A0}
+
+  .game-grid{display:grid;grid-template-columns:1fr;gap:10px;margin:14px 0}
+  @media(min-width:600px){.game-grid{grid-template-columns:1fr 1fr}}
+  .game-card{background:linear-gradient(135deg,#FFF6E1,#fffaf0);border:3px solid #FFE0A0;border-radius:14px;padding:14px;font-weight:700}
+  .game-card strong{color:var(--pumpkin);display:block;margin-bottom:4px;font-size:1.05rem}
+
+  /* ===== MC Quiz ===== */
+  .qbox{background:#fff;border:3px solid #E2E8F0;border-radius:18px;padding:18px;margin:14px 0;transition:border-color .25s}
+  .qbox.ok{border-color:var(--ok);background:#F0FBF3}
+  .qbox.bad{border-color:var(--bad);background:#FEF2F2}
+  .qprompt{font-weight:800;font-size:1.05rem;margin-bottom:12px;color:var(--navy)}
+  .opts{display:grid;grid-template-columns:1fr;gap:8px}
+  @media(min-width:600px){.opts{grid-template-columns:1fr 1fr}}
+  .opt{background:#fff;border:3px solid #cbd5e1;border-radius:12px;padding:12px 14px;font-weight:700;cursor:pointer;text-align:left;font-family:inherit;font-size:1rem;transition:all .15s}
+  .opt:hover{border-color:var(--gold);background:#FFF8E8;transform:translateY(-2px)}
+  .opt.right{background:#D9F7E1;border-color:var(--ok);color:#065f46}
+  .opt.wrong{background:#FFE2E2;border-color:var(--bad);color:#991b1b}
+  .opt:disabled{cursor:not-allowed}
+  .feedback{margin-top:10px;padding:12px;border-radius:10px;font-weight:700;font-size:.96rem;display:none}
+  .feedback.show{display:block}
+  .feedback.ok{background:#D9F7E1;color:#065f46}
+  .feedback.bad{background:#FFE2E2;color:#991b1b}
+
+  /* ===== Fill-in / Scramble ===== */
+  .fillrow{display:flex;align-items:center;gap:10px;margin:10px 0;flex-wrap:wrap;background:#fffaf0;padding:12px 14px;border-radius:12px;border:2px dashed #FFC97A}
+  .fillrow .lab{font-weight:800;color:var(--navy)}
+  .fillin{font-family:inherit;font-size:1.1rem;font-weight:800;padding:8px 12px;border:2px solid #cbd5e1;border-radius:9px;width:120px;text-align:center;background:#fff;text-transform:uppercase}
+  .fillin.num{width:90px;text-transform:none}
+  .fillin.ok{border-color:var(--ok);background:#D9F7E1}
+  .fillin.bad{border-color:var(--bad);background:#FFE2E2}
+  .checkbtn{padding:9px 18px;border-radius:10px;border:none;background:var(--pumpkin);color:#fff;font-weight:900;cursor:pointer;font-family:inherit}
+  .checkbtn:hover{background:#E07A2F}
+  .fillfb{font-weight:800;font-size:.95rem}
+  .scram{font-family:'Bangers',cursive;letter-spacing:6px;font-size:1.9rem;color:var(--berry);background:#fff;border:3px solid #FFE0A0;border-radius:12px;padding:6px 16px;display:inline-block}
+
+  /* ===== Hangman ===== */
+  .hm-stage{text-align:center}
+  .hm-scene{font-size:3.4rem;margin:6px 0}
+  .hm-hint{background:#EAF6FF;border:3px solid #C9E5FB;border-radius:14px;padding:12px 16px;font-weight:800;color:var(--navy);margin:10px 0}
+  .hm-word{font-family:'Bangers',cursive;font-size:2.6rem;letter-spacing:10px;color:var(--navy);margin:14px 0;min-height:46px}
+  .hm-lives{font-size:1.6rem;margin:6px 0;letter-spacing:4px}
+  .hm-msg{font-weight:800;min-height:26px;margin:8px 0}
+  .keyboard{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:560px;margin:10px auto}
+  .key{width:42px;height:46px;border-radius:10px;border:3px solid #cbd5e1;background:#fff;font-family:'Fredoka One',cursive;font-size:1.15rem;color:var(--navy);cursor:pointer;transition:all .12s}
+  .key:hover:not(:disabled){background:#FFF8E8;border-color:var(--gold);transform:translateY(-2px)}
+  .key:disabled{cursor:not-allowed;opacity:.55}
+  .key.hit{background:#D9F7E1;border-color:var(--ok);color:#065f46}
+  .key.miss{background:#FFE2E2;border-color:var(--bad);color:#991b1b}
+  .hm-next{margin-top:10px;display:none}
+  .hm-next.show{display:inline-flex}
+
+  /* ===== Adjective tap ===== */
+  .adj-pool{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0;justify-content:center}
+  .adj{background:linear-gradient(135deg,#fff,#FFFAEC);border:3px solid #FFE0A0;padding:8px 14px;border-radius:24px;font-weight:800;cursor:pointer;transition:all .15s;font-size:1rem}
+  .adj:hover{transform:scale(1.06);background:#FFF6E1}
+  .adj.picked{background:var(--leaf);color:#fff;border-color:var(--leaf)}
+
+  /* ===== Effects ===== */
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:200;display:none}
+  .conf-piece{position:absolute;width:10px;height:10px;animation:fall 1.6s linear forwards}
+  @keyframes fall{to{transform:translateY(100vh) rotate(720deg);opacity:0}}
+  #xover{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:150;pointer-events:none}
+  #xover.show{display:flex;animation:xpop .55s ease-out}
+  #xover .x{font-size:8rem;color:var(--bad);font-weight:900;text-shadow:0 0 24px rgba(220,38,38,.5)}
+  @keyframes xpop{0%{transform:scale(.3);opacity:0}40%{transform:scale(1.3);opacity:1}100%{transform:scale(1);opacity:0}}
+
+  .quote{font-style:italic;text-align:center;font-size:1.12rem;color:var(--navy);background:linear-gradient(135deg,#FFF6E1,#FFE9C7);padding:18px;border-radius:16px;border-left:6px solid var(--gold);margin:20px 0}
+  .footer-tag{text-align:center;color:#64748b;font-size:.8rem;margin-top:16px;font-weight:700;line-height:1.5}
+</style>
+</head>
+<body>
+
+<!-- ===== HUD ===== -->
+<div class="hud">
+  <div class="hud-left">🐮 Bristol's Barnyard Game Day — 6A</div>
+  <div class="hud-right">
+    <div class="stat"><span class="ico">⭐</span><span id="xpVal">0</span> XP</div>
+    <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+    <div class="stat"><span class="ico">🪙</span><span id="coinVal">0</span></div>
+    <div class="stat"><span class="ico">🏆</span> Lvl <span id="lvlVal">1</span></div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ===== Slide 0: Welcome ===== -->
+<div class="slide active">
+  <span class="badge">🎮 Lesson 6A · GAME DAY!</span>
+  <h1>🐮 Welcome to Game Day, Bristol! 🦊</h1>
+  <div class="mascot-row">🐔 🐄 🐖 🐎 🦊</div>
+  <div class="card card-gold">
+    <p style="font-size:1.12rem"><strong>No lessons today — just FUN!</strong> 🎉 You already learned all your big skills. Now let's play games to show how smart you are!</p>
+  </div>
+  <h3>🕹️ Today's Games:</h3>
+  <div class="game-grid">
+    <div class="game-card"><strong>🐮 Barnyard Hangman</strong>Guess the math word!</div>
+    <div class="game-card"><strong>⚡ Speedy Sums</strong>Type the answer fast!</div>
+    <div class="game-card"><strong>🎯 Coins &amp; Clocks</strong>Tap the right answer</div>
+    <div class="game-card"><strong>🔤 Spelling Scramble</strong>Unscramble the word</div>
+    <div class="game-card"><strong>🦊 Word Wizard</strong>Synonyms, capitals &amp; more</div>
+    <div class="game-card"><strong>🌟 Big Finish</strong>Confetti party!</div>
+  </div>
+  <div class="card card-pink">
+    <p>🎮 <strong>How to win:</strong> Every right answer earns ⭐ XP and 🪙 coins. Try your best — and have fun!</p>
+  </div>
+  <div class="nav">
+    <span></span>
+    <button class="btn btn-go" data-go="1">Let's Play! 🚀</button>
+  </div>
+</div>
+
+<!-- ===== Slide 1: Barnyard Hangman ===== -->
+<div class="slide">
+  <span class="badge">🐮 Game 1 · Hangman</span>
+  <h2>Barnyard Hangman 🐔</h2>
+  <p>Guess the secret math word one letter at a time. You get <strong>6 tries</strong> (hearts). Read the hint!</p>
+  <div class="hm-stage" id="hm">
+    <div class="hm-scene" id="hmScene">🐔</div>
+    <div class="hm-hint" id="hmHint">Hint loading...</div>
+    <div class="hm-lives" id="hmLives">❤️ ❤️ ❤️ ❤️ ❤️ ❤️</div>
+    <div class="hm-word" id="hmWord"></div>
+    <div class="hm-msg" id="hmMsg"></div>
+    <div class="keyboard" id="hmKeys"></div>
+    <button class="btn btn-go hm-next" id="hmNext" data-action="hm-next">Next Word ➡️</button>
+  </div>
+  <div class="nav">
+    <button class="btn btn-back" data-go="0">← Back</button>
+    <div class="dots"></div>
+    <button class="btn btn-go" data-go="2">Next Game ⚡</button>
+  </div>
+</div>
+
+<!-- ===== Slide 2: Speedy Sums (fill-in) ===== -->
+<div class="slide">
+  <span class="badge">⚡ Game 2 · Speed Math</span>
+  <h2>Speedy Sums &amp; Times! ➕✖️</h2>
+  <p>Type the answer in the box, then tap <strong>Check</strong>. No peeking — you've got this! 🐄</p>
+
+  <div class="fillrow"><span class="lab">🐔 38 + 27 =</span><input class="fillin num" inputmode="numeric" data-ans="65"><button class="checkbtn" data-action="check">Check</button><span class="fillfb"></span></div>
+  <div class="fillrow"><span class="lab">🐑 72 − 35 =</span><input class="fillin num" inputmode="numeric" data-ans="37"><button class="checkbtn" data-action="check">Check</button><span class="fillfb"></span></div>
+  <div class="fillrow"><span class="lab">🐎 3 × 7 =</span><input class="fillin num" inputmode="numeric" data-ans="21"><button class="checkbtn" data-action="check">Check</button><span class="fillfb"></span></div>
+  <div class="fillrow"><span class="lab">🐝 6 × 4 =</span><input class="fillin num" inputmode="numeric" data-ans="24"><button class="checkbtn" data-action="check">Check</button><span class="fillfb"></span></div>
+  <div class="fillrow"><span class="lab">🐖 56 + 28 =</span><input class="fillin num" inputmode="numeric" data-ans="84"><button class="checkbtn" data-action="check">Check</button><span class="fillfb"></span></div>
+  <div class="fillrow"><span class="lab">🐈 90 − 46 =</span><input class="fillin num" inputmode="numeric" data-ans="44"><button class="checkbtn" data-action="check">Check</button><span class="fillfb"></span></div>
+
+  <div class="nav">
+    <button class="btn btn-back" data-go="1">← Back</button>
+    <div class="dots"></div>
+    <button class="btn btn-go" data-go="3">Next Game 🎯</button>
+  </div>
+</div>
+
+<!-- ===== Slide 3: Coins & Clocks (MC) ===== -->
+<div class="slide">
+  <span class="badge">🎯 Game 3 · Tap It!</span>
+  <h2>Coins &amp; Clocks 💰🕐</h2>
+  <p>Tap the answer you think is right. Get it correct for confetti! 🎉</p>
+
+  <div class="qbox" data-q="mc1">
+    <div class="qprompt">💰 You have 2 quarters and 1 dime. How many cents?</div>
+    <div class="opts">
+      <button class="opt" data-c="0">50¢</button>
+      <button class="opt" data-c="0">35¢</button>
+      <button class="opt" data-c="1">60¢</button>
+      <button class="opt" data-c="0">70¢</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="qbox" data-q="mc2">
+    <div class="qprompt">🍬 Candy costs 65¢. You pay with $1.00. How much change?</div>
+    <div class="opts">
+      <button class="opt" data-c="1">35¢</button>
+      <button class="opt" data-c="0">45¢</button>
+      <button class="opt" data-c="0">25¢</button>
+      <button class="opt" data-c="0">55¢</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="qbox" data-q="mc3">
+    <div class="qprompt">🕘 The short hand is on 9 and the long hand is on 12. What time is it?</div>
+    <div class="opts">
+      <button class="opt" data-c="0">12:09</button>
+      <button class="opt" data-c="1">9:00</button>
+      <button class="opt" data-c="0">9:12</button>
+      <button class="opt" data-c="0">8:00</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="qbox" data-q="mc4">
+    <div class="qprompt">⏰ The long hand is on the 6. How many minutes past the hour?</div>
+    <div class="opts">
+      <button class="opt" data-c="0">6 minutes</button>
+      <button class="opt" data-c="0">12 minutes</button>
+      <button class="opt" data-c="0">60 minutes</button>
+      <button class="opt" data-c="1">30 minutes</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="qbox" data-q="mc5">
+    <div class="qprompt">🪙 You have 3 dimes and 2 nickels. How many cents?</div>
+    <div class="opts">
+      <button class="opt" data-c="1">40¢</button>
+      <button class="opt" data-c="0">35¢</button>
+      <button class="opt" data-c="0">50¢</button>
+      <button class="opt" data-c="0">32¢</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="qbox" data-q="mc6">
+    <div class="qprompt">🛒 A snack costs $1.25. You pay with $2.00. How much change?</div>
+    <div class="opts">
+      <button class="opt" data-c="0">$1.00</button>
+      <button class="opt" data-c="1">$0.75</button>
+      <button class="opt" data-c="0">$0.25</button>
+      <button class="opt" data-c="0">$1.25</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="nav">
+    <button class="btn btn-back" data-go="2">← Back</button>
+    <div class="dots"></div>
+    <button class="btn btn-go" data-go="4">Next Game 🔤</button>
+  </div>
+</div>
+
+<!-- ===== Slide 4: Spelling Scramble ===== -->
+<div class="slide">
+  <span class="badge">🔤 Game 4 · Spelling</span>
+  <h2>Spelling Scramble! 🧩</h2>
+  <p>The letters got all mixed up! Read the hint and type the word the <strong>right</strong> way.</p>
+
+  <div class="card card-grass">
+    <p>🐄 <strong>Hint:</strong> Moo! It lives on a farm and gives milk.</p>
+    <div class="fillrow"><span class="scram">W C O</span><input class="fillin" maxlength="3" data-ans="COW"><button class="checkbtn" data-action="check">Check</button><span class="fillfb"></span></div>
+  </div>
+
+  <div class="card card-sky">
+    <p>🕐 <strong>Hint:</strong> A clock tells you this.</p>
+    <div class="fillrow"><span class="scram">M I E T</span><input class="fillin" maxlength="4" data-ans="TIME"><button class="checkbtn" data-action="check">Check</button><span class="fillfb"></span></div>
+  </div>
+
+  <div class="card card-gold">
+    <p>🪙 <strong>Hint:</strong> Round money you can hold, like pennies and dimes.</p>
+    <div class="fillrow"><span class="scram">N I C O S</span><input class="fillin" maxlength="5" data-ans="COINS"><button class="checkbtn" data-action="check">Check</button><span class="fillfb"></span></div>
+  </div>
+
+  <div class="card card-pink">
+    <p>🚜 <strong>Hint:</strong> The place where the cows, pigs, and chickens live.</p>
+    <div class="fillrow"><span class="scram">R A F M</span><input class="fillin" maxlength="4" data-ans="FARM"><button class="checkbtn" data-action="check">Check</button><span class="fillfb"></span></div>
+  </div>
+
+  <div class="nav">
+    <button class="btn btn-back" data-go="3">← Back</button>
+    <div class="dots"></div>
+    <button class="btn btn-go" data-go="5">Next Game 🦊</button>
+  </div>
+</div>
+
+<!-- ===== Slide 5: Word Wizard ===== -->
+<div class="slide">
+  <span class="badge">🦊 Game 5 · Word Wizard</span>
+  <h2>Word Wizard 📚</h2>
+  <p>Show off your reading magic! Tap the best answer.</p>
+
+  <div class="qbox" data-q="w1">
+    <div class="qprompt">🌟 Which word means the SAME as <strong>BIG</strong>? (synonym)</div>
+    <div class="opts">
+      <button class="opt" data-c="0">tiny</button>
+      <button class="opt" data-c="0">small</button>
+      <button class="opt" data-c="0">sad</button>
+      <button class="opt" data-c="1">huge</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="qbox" data-q="w2">
+    <div class="qprompt">🌗 Which word is the OPPOSITE of <strong>FAST</strong>? (antonym)</div>
+    <div class="opts">
+      <button class="opt" data-c="0">quick</button>
+      <button class="opt" data-c="0">speedy</button>
+      <button class="opt" data-c="1">slow</button>
+      <button class="opt" data-c="0">zoom</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="qbox" data-q="w3">
+    <div class="qprompt">🍔 Which one is a <strong>compound word</strong> (two words stuck together)?</div>
+    <div class="opts">
+      <button class="opt" data-c="1">sunflower</button>
+      <button class="opt" data-c="0">running</button>
+      <button class="opt" data-c="0">happy</button>
+      <button class="opt" data-c="0">jumped</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="qbox" data-q="w4">
+    <div class="qprompt">🔠 Which sentence uses CAPITAL letters correctly?</div>
+    <div class="opts">
+      <button class="opt" data-c="0">my cat sam is soft.</button>
+      <button class="opt" data-c="1">My cat Sam is soft.</button>
+      <button class="opt" data-c="0">my Cat sam Is soft.</button>
+      <button class="opt" data-c="0">My cat sam is Soft.</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="qbox" data-q="w5">
+    <div class="qprompt">📝 Which end mark goes here? <em>"Are you ready ___"</em></div>
+    <div class="opts">
+      <button class="opt" data-c="0">.</button>
+      <button class="opt" data-c="0">,</button>
+      <button class="opt" data-c="0">!</button>
+      <button class="opt" data-c="1">?</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="qbox" data-q="w6">
+    <div class="qprompt">📝 Which end mark goes here? <em>"I love the farm ___"</em></div>
+    <div class="opts">
+      <button class="opt" data-c="0">?</button>
+      <button class="opt" data-c="0">,</button>
+      <button class="opt" data-c="1">.</button>
+      <button class="opt" data-c="0">"</button>
+    </div>
+    <div class="feedback"></div>
+  </div>
+
+  <div class="card card-pink">
+    <h3>✨ Bonus: Adjective Hunt!</h3>
+    <p>Tap every <strong>describing word</strong> (adjective) you love. Each tap = 🪙 1 coin!</p>
+    <div class="adj-pool">
+      <span class="adj">fluffy</span><span class="adj">sparkly</span><span class="adj">enormous</span>
+      <span class="adj">soft</span><span class="adj">tiny</span><span class="adj">giggly</span>
+      <span class="adj">shiny</span><span class="adj">bouncy</span><span class="adj">cozy</span>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="btn btn-back" data-go="4">← Back</button>
+    <div class="dots"></div>
+    <button class="btn btn-go" data-go="6">Big Finish! 🌟</button>
+  </div>
+</div>
+
+<!-- ===== Slide 6: Finale ===== -->
+<div class="slide">
+  <span class="badge">🌟 You Did It!</span>
+  <h1>🎉 Amazing, Bristol! 🎉</h1>
+  <div class="mascot-row">🐔 🐄 🐖 🐎 🦊</div>
+  <div class="card card-gold" style="text-align:center">
+    <h2 style="text-align:center">Your Game Day Score</h2>
+    <p style="font-size:2.2rem;font-family:'Bangers',cursive;color:var(--navy)">⭐ <span id="finalXP">0</span> XP · 🪙 <span id="finalCoins">0</span> coins</p>
+    <p style="font-size:1.2rem;font-weight:800;color:var(--pumpkin)" id="finalTitle">Champion!</p>
+  </div>
+  <div class="quote">
+    "Education is the key to unlock the golden door of freedom."<br><strong>— George Washington Carver</strong><br>
+    <span style="font-size:.95rem;color:var(--pumpkin)">(a famous scientist who loved plants and farms, just like you! 🌱)</span>
+  </div>
+  <div class="card card-pink" style="text-align:center">
+    <p style="font-size:1.1rem">🏆 You played every game like a true champion. Give yourself a big high-five! ✋</p>
+  </div>
+  <div class="footer-tag">
+    KingCretot Experience · Bristol's Lesson 6A Game Day<br>
+    Jonathan King-Cretot, Founder &amp; CEO · 914.809.0112 · kce@kingcretot.com · www.kingcretot.com
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<!-- ===== Effects ===== -->
+<div id="confetti"></div>
+<div id="xover"><div class="x">✕</div></div>
+
+<script>
+/* ============ State ============ */
+const state = { xp:0, coins:0, lvl:1, answered:{} };
+const slides = Array.from(document.querySelectorAll('.slide'));
+const N = slides.length;
+
+function escapeHTML(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function updateHud(){
+  document.getElementById('xpVal').textContent = state.xp;
+  document.getElementById('coinVal').textContent = state.coins;
+  document.getElementById('lvlVal').textContent = state.lvl;
+  document.getElementById('xpFill').style.width = Math.min(100, (state.xp % 100)) + '%';
+  if (state.xp >= state.lvl * 100) state.lvl++;
+}
+function addXP(n){ state.xp += n; updateHud(); }
+function addCoins(n){ state.coins += n; updateHud(); }
+
+/* ============ Navigation ============ */
+function navigate(i){
+  if (i < 0 || i >= N) return;
+  slides.forEach(s => s.classList.remove('active'));
+  slides[i].classList.add('active');
+  buildDots(i);
+  window.scrollTo({ top:0, behavior:'smooth' });
+  if (i === N - 1) showFinal();
+}
+function buildDots(active){
+  document.querySelectorAll('.dots').forEach(d => {
+    d.innerHTML = '';
+    for (let k = 0; k < N; k++){
+      const dot = document.createElement('div');
+      dot.className = 'dot' + (k === active ? ' on' : '') + (k < active ? ' done' : '');
+      d.appendChild(dot);
+    }
+  });
+}
+
+/* ============ Sound (Web Audio) ============ */
+let audioCtx;
+function getCtx(){
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+function playRight(){
+  const c = getCtx();
+  [523, 659, 784, 1047].forEach((f, i) => {
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = 'sine'; o.frequency.value = f;
+    g.gain.setValueAtTime(0, c.currentTime + i * 0.08);
+    g.gain.linearRampToValueAtTime(0.18, c.currentTime + i * 0.08 + 0.02);
+    g.gain.linearRampToValueAtTime(0, c.currentTime + i * 0.08 + 0.18);
+    o.connect(g); g.connect(c.destination);
+    o.start(c.currentTime + i * 0.08); o.stop(c.currentTime + i * 0.08 + 0.2);
+  });
+}
+function playWrong(){
+  const c = getCtx();
+  const o = c.createOscillator(), g = c.createGain();
+  o.type = 'sawtooth'; o.frequency.setValueAtTime(220, c.currentTime);
+  o.frequency.linearRampToValueAtTime(80, c.currentTime + 0.4);
+  g.gain.setValueAtTime(0.16, c.currentTime);
+  g.gain.linearRampToValueAtTime(0, c.currentTime + 0.4);
+  o.connect(g); g.connect(c.destination);
+  o.start(); o.stop(c.currentTime + 0.4);
+}
+
+/* ============ Effects ============ */
+function confetti(){
+  const root = document.getElementById('confetti');
+  root.style.display = 'block';
+  const colors = ['#E0AC3C','#FF9447','#86D464','#7CC6FF','#FFB7D5','#C84B7C'];
+  for (let i = 0; i < 70; i++){
+    const p = document.createElement('div');
+    p.className = 'conf-piece';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.top = '-10px';
+    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    p.style.animationDelay = (Math.random() * 0.4) + 's';
+    p.style.animationDuration = (1.2 + Math.random() * 1.2) + 's';
+    p.style.borderRadius = (Math.random() > 0.5 ? '50%' : '2px');
+    root.appendChild(p);
+  }
+  setTimeout(() => { root.innerHTML = ''; root.style.display = 'none'; }, 2400);
+}
+function flashX(){
+  const x = document.getElementById('xover');
+  x.classList.add('show');
+  setTimeout(() => x.classList.remove('show'), 600);
+}
+
+/* ============ Hangman engine ============ */
+const HM_WORDS = [
+  { word:'CARRY',   scene:'🐔', hint:'When the ones add up to 10 or more, you ___ the ten over to the next place.' },
+  { word:'BORROW',  scene:'🐑', hint:'When you can\u2019t take the bottom away, you ___ a ten from next door.' },
+  { word:'QUARTER', scene:'🪙', hint:'A round coin that is worth 25 cents.' },
+  { word:'CLOCK',   scene:'🕐', hint:'It has a short hand and a long hand, and it tells you the time.' }
+];
+const hm = { idx:0, guessed:[], lives:6, over:false };
+
+function renderHangman(){
+  const data = HM_WORDS[hm.idx];
+  document.getElementById('hmScene').textContent = data.scene;
+  document.getElementById('hmHint').textContent = '💡 ' + data.hint;
+  document.getElementById('hmLives').textContent =
+    '❤️'.repeat(hm.lives) + '🤍'.repeat(6 - hm.lives);
+  // word display
+  const shown = data.word.split('').map(ch =>
+    hm.guessed.includes(ch) ? ch : '_').join(' ');
+  document.getElementById('hmWord').textContent = shown;
+  document.getElementById('hmMsg').textContent = '';
+  // keyboard
+  const kb = document.getElementById('hmKeys');
+  kb.innerHTML = '';
+  for (let i = 65; i <= 90; i++){
+    const ch = String.fromCharCode(i);
+    const b = document.createElement('button');
+    b.className = 'key';
+    b.textContent = ch;
+    b.dataset.letter = ch;
+    kb.appendChild(b);
+  }
+  document.getElementById('hmNext').classList.remove('show');
+  hm.over = false;
+}
+
+function hangmanGuess(keyEl){
+  if (hm.over) return;
+  const ch = keyEl.dataset.letter;
+  if (hm.guessed.includes(ch)) return;
+  hm.guessed.push(ch);
+  const data = HM_WORDS[hm.idx];
+  const msg = document.getElementById('hmMsg');
+  if (data.word.includes(ch)){
+    keyEl.classList.add('hit'); keyEl.disabled = true;
+    const shown = data.word.split('').map(c =>
+      hm.guessed.includes(c) ? c : '_').join(' ');
+    document.getElementById('hmWord').textContent = shown;
+    playRight();
+    // solved?
+    if (data.word.split('').every(c => hm.guessed.includes(c))){
+      hm.over = true;
+      msg.style.color = 'var(--ok)';
+      msg.textContent = '🎉 You got it! The word is ' + data.word + '!';
+      addXP(15); addCoins(3);
+      confetti();
+      finishHangmanRound();
+    }
+  } else {
+    keyEl.classList.add('miss'); keyEl.disabled = true;
+    hm.lives--;
+    document.getElementById('hmLives').textContent =
+      '❤️'.repeat(Math.max(0, hm.lives)) + '🤍'.repeat(6 - Math.max(0, hm.lives));
+    playWrong(); flashX();
+    if (hm.lives <= 0){
+      hm.over = true;
+      msg.style.color = 'var(--bad)';
+      msg.textContent = 'Out of hearts! The word was ' + data.word + '. Let\u2019s try the next one! 🌟';
+      document.querySelectorAll('#hmWord').forEach(() => {});
+      document.getElementById('hmWord').textContent = data.word.split('').join(' ');
+      finishHangmanRound();
+    }
+  }
+}
+
+function finishHangmanRound(){
+  // disable remaining keys
+  document.querySelectorAll('#hmKeys .key').forEach(k => k.disabled = true);
+  const next = document.getElementById('hmNext');
+  if (hm.idx < HM_WORDS.length - 1){
+    next.textContent = 'Next Word ➡️';
+    next.classList.add('show');
+  } else {
+    const msg = document.getElementById('hmMsg');
+    msg.textContent += '  🏆 You finished all the hangman words!';
+  }
+}
+
+function nextHangmanWord(){
+  if (hm.idx >= HM_WORDS.length - 1) return;
+  hm.idx++; hm.guessed = []; hm.lives = 6; hm.over = false;
+  renderHangman();
+}
+
+/* ============ Check (fill-in + scramble) ============ */
+function doCheck(btn){
+  const row = btn.closest('.fillrow');
+  if (!row) return;
+  const inp = row.querySelector('.fillin');
+  const fb = row.querySelector('.fillfb');
+  if (inp.disabled) return;
+  const got = inp.value.trim().toUpperCase().replace(/\s+/g,'');
+  const want = String(inp.dataset.ans).trim().toUpperCase().replace(/\s+/g,'');
+  if (got === want){
+    inp.classList.remove('bad'); inp.classList.add('ok'); inp.disabled = true;
+    btn.disabled = true;
+    fb.style.color = 'var(--ok)';
+    fb.textContent = '✅ Yes! ' + inp.dataset.ans;
+    addXP(8); addCoins(2);
+    playRight(); confetti();
+  } else {
+    inp.classList.add('bad');
+    fb.style.color = 'var(--bad)';
+    fb.textContent = '❌ Try again!';
+    playWrong(); flashX();
+    setTimeout(() => { inp.classList.remove('bad'); fb.textContent = ''; }, 1400);
+  }
+}
+
+/* ============ MC option ============ */
+function doOpt(opt){
+  const box = opt.closest('.qbox');
+  if (!box) return;
+  const qid = box.dataset.q;
+  if (state.answered[qid]) return;
+  const correct = opt.dataset.c === '1';
+  const fb = box.querySelector('.feedback');
+  box.querySelectorAll('.opt').forEach(b => b.disabled = true);
+  if (correct){
+    opt.classList.add('right'); box.classList.add('ok');
+    fb.textContent = '🎉 Correct! Super work!';
+    fb.className = 'feedback show ok';
+    addXP(10); addCoins(2);
+    playRight(); confetti();
+  } else {
+    opt.classList.add('wrong'); box.classList.add('bad');
+    box.querySelectorAll('.opt').forEach(b => { if (b.dataset.c === '1') b.classList.add('right'); });
+    fb.textContent = '❌ The green one is the answer — keep playing!';
+    fb.className = 'feedback show bad';
+    playWrong(); flashX();
+  }
+  state.answered[qid] = true;
+}
+
+/* ============ Single delegated click handler ============ */
+document.addEventListener('click', e => {
+  const goBtn = e.target.closest('[data-go]');
+  if (goBtn){ navigate(parseInt(goBtn.dataset.go, 10)); return; }
+
+  const nextBtn = e.target.closest('[data-action="hm-next"]');
+  if (nextBtn){ nextHangmanWord(); return; }
+
+  const key = e.target.closest('[data-letter]');
+  if (key){ hangmanGuess(key); return; }
+
+  const chk = e.target.closest('[data-action="check"]');
+  if (chk){ doCheck(chk); return; }
+
+  const adj = e.target.closest('.adj');
+  if (adj){
+    adj.classList.toggle('picked');
+    if (adj.classList.contains('picked')){ addCoins(1); playRight(); }
+    return;
+  }
+
+  const opt = e.target.closest('.opt');
+  if (opt){ doOpt(opt); return; }
+});
+
+/* Allow Enter key to check fill-in rows */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter'){
+    const inp = e.target.closest && e.target.closest('.fillin');
+    if (inp){
+      const btn = inp.closest('.fillrow').querySelector('.checkbtn');
+      if (btn && !btn.disabled) doCheck(btn);
+    }
+  }
+});
+
+/* ============ Final ============ */
+function showFinal(){
+  document.getElementById('finalXP').textContent = state.xp;
+  document.getElementById('finalCoins').textContent = state.coins;
+  let title = 'Game Day Champion! 🏆';
+  if (state.xp >= 180) title = 'Barnyard SUPERSTAR! 🌟';
+  else if (state.xp >= 110) title = 'Game Wizard! ✨';
+  else if (state.xp >= 50) title = 'Rising Star! ⭐';
+  document.getElementById('finalTitle').textContent = title;
+  setTimeout(confetti, 300);
+  setTimeout(confetti, 1200);
+}
+
+/* ============ Init ============ */
+renderHangman();
+updateHud();
+buildDots(0);
+</script>
+</body>
+</html>
